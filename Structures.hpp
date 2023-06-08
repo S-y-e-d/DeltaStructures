@@ -8,18 +8,28 @@
 struct Block {
     sf::RectangleShape shape;
     sf::Text num_text;
+    sf::Text index;
     int value;
 };
 
 class Array {
     std::vector<Block> array;
-    int array_block_size = 100;
+
+    sf::RenderWindow &window;
+    sf::Font &font;
+    int array_block_outline = 2;
+    int array_block_size = 75;
     bool change_made = false;
+    sf::RectangleShape block_add;
+    sf::RectangleShape block_remove;
 
 public:
-    Array();
-    void update(sf::RenderWindow &window);
+    Array(sf::RenderWindow &window, sf::Font &font);
+    void update();
     void addBlock(int value);
+    void removeBlock();
+    void setBlockSize(int size);
+    void handleClick(float mouseX, float mouseY);
 };
 
 #endif

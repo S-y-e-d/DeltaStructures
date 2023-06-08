@@ -29,9 +29,8 @@ class Panel {
 public:
     Panel(sf::Vector2f size, sf::Vector2f pos);
     sf::RectangleShape& getPanel();
-    bool clicked(float mouseX, float mouseY);
+    void handleClick(float mouseX, float mouseY);
     void setStates(sf::Vector2f, sf::Vector2f);
-    void move();
     void update(sf::RenderWindow& window);
 
     void addComponent(int radius, int sides, sf::Color, State state1, State state2);

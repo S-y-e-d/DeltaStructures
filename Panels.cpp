@@ -5,9 +5,11 @@ Panel::Panel(sf::Vector2f size, sf::Vector2f pos) {
     panel.setSize(size);
     panel.setPosition(pos);
 }
-bool Panel::clicked(float mouseX, float mouseY) {
-    if (moving) return false;
-    return components[0].shape.getGlobalBounds().contains(mouseX, mouseY);
+void Panel::handleClick(float mouseX, float mouseY) {
+    if (moving) return;
+    if(components[0].shape.getGlobalBounds().contains(mouseX, mouseY)){
+        moving = true;
+    }
 }
 
 void Panel::setStates(sf::Vector2f s1, sf::Vector2f s2) {
@@ -15,10 +17,6 @@ void Panel::setStates(sf::Vector2f s1, sf::Vector2f s2) {
     state_2 = s2;
     velocity.x = (s2.x - s1.x) / 10;
     velocity.y = (s2.y - s1.y) / 10;
-}
-
-void Panel::move() {
-    moving = true;
 }
 
 void Panel::update(sf::RenderWindow& window) {
