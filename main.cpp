@@ -23,15 +23,18 @@ int main() {
 
     lpanel.addComponent(10, 3, sf::Color::Black, State{sf::Vector2f(137, window_size.y/2-5), 90}, State{sf::Vector2f(137, window_size.y/2-5), 270});
     Array array(window, font);
-    array.addBlock(1);
-    array.addBlock(2);
-    array.addBlock(3);
+    array.addBlock(12);
+    array.addBlock(123);
+    array.addBlock(12345);
 
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
+            }else if(event.type == sf::Event::Resized){
+                window.setSize(sf::Vector2u(event.size.width, event.size.height));
+                // array.handleResize(); // Needs implementation
             }
             // Detecting keyboard input
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {

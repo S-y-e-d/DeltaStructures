@@ -14,11 +14,9 @@ struct Block {
 
 class Array {
     std::vector<Block> array;
-
     sf::RenderWindow &window;
     sf::Font &font;
-    int array_block_outline = 2;
-    int array_block_size = 75;
+    int block_size = 75;
     bool change_made = false;
     sf::RectangleShape block_add;
     sf::RectangleShape block_remove;
