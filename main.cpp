@@ -35,6 +35,8 @@ int main() {
             }else if(event.type == sf::Event::Resized){
                 window.setSize(sf::Vector2u(event.size.width, event.size.height));
                 // array.handleResize(); // Needs implementation
+            }else if(event.type == sf::Event::TextEntered) {
+                array.handleKeypress(event.text.unicode);
             }
             // Detecting keyboard input
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
