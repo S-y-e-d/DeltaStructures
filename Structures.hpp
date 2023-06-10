@@ -4,7 +4,9 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
-#include <string>
+#include <thread>
+#include <chrono>
+#include<unistd.h> 
 
 struct Block {
     sf::RectangleShape shape;
@@ -19,6 +21,7 @@ enum SortType {
 class Array {
     std::vector<Block> array;
     sf::RenderWindow &window;
+    sf::Vector2u window_size;
     sf::Font &font;
     int block_size = 75;
     int value_char_size = 36;
@@ -27,7 +30,8 @@ class Array {
     sf::RectangleShape block_remove;
 
     int value_edit_index = -1;
-    SortType sort_type = NONE;
+    SortType sort_type = SortType::NONE;
+    bool swapBlocks(int i, int j);
     void selectionSort();
 
 public:

@@ -23,9 +23,10 @@ int main() {
 
     lpanel.addComponent(10, 3, sf::Color::Black, State{sf::Vector2f(137, window_size.y/2-5), 90}, State{sf::Vector2f(137, window_size.y/2-5), 270});
     Array array(window, font);
-    array.addBlock(12);
-    array.addBlock(123);
-    array.addBlock(12345);
+    array.addBlock(3);
+    array.addBlock(555);
+    array.addBlock(4);
+    array.addBlock(2);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -45,6 +46,7 @@ int main() {
             // Triggering test events
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
                 // array.setBlockSize(50);
+                array.sort(SortType::SELECTION);
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {
@@ -52,7 +54,6 @@ int main() {
                     // Convert the position of the pixel to the relative coordinate of the original window
                     sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
                     sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
-
                     lpanel.handleClick(worldPos.x, worldPos.y);
                     array.handleClick(worldPos.x, worldPos.y);
                 }
