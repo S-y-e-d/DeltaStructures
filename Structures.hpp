@@ -30,8 +30,10 @@ class Array {
     sf::RectangleShape block_remove;
 
     int value_edit_index = -1;
+    
     SortType sort_type = SortType::NONE;
     bool swapBlocks(int i, int j);
+    std::vector<sf::CircleShape> temp_drawables;
     void selectionSort();
 
 public:

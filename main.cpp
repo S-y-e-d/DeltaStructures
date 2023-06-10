@@ -24,7 +24,7 @@ int main() {
     lpanel.addComponent(10, 3, sf::Color::Black, State{sf::Vector2f(137, window_size.y/2-5), 90}, State{sf::Vector2f(137, window_size.y/2-5), 270});
     Array array(window, font);
     array.addBlock(3);
-    array.addBlock(555);
+    array.addBlock(5);
     array.addBlock(4);
     array.addBlock(2);
 
