@@ -1,6 +1,7 @@
 #include "Panels.hpp"
 #include "Structures.hpp"
 
+// refactor panels to use threads and use move instead of set positions.
 
 int main() {
     sf::ContextSettings settings;
@@ -33,9 +34,6 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
-            }else if(event.type == sf::Event::Resized){
-                window.setSize(sf::Vector2u(event.size.width, event.size.height));
-                // array.handleResize(); // Needs implementation
             }else if(event.type == sf::Event::TextEntered) {
                 array.handleKeypress(event.text.unicode);
             }
@@ -46,7 +44,10 @@ int main() {
             // Triggering test events
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
                 // array.setBlockSize(50);
-                array.sort(SortType::SELECTION);
+                // array.sort(SortType::INSERTION);
+                // array.sort(SortType::SELECTION);
+                // array.insertAt(9, 4);
+                array.remove(1);
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {

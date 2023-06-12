@@ -7,11 +7,13 @@
 #include <thread>
 #include <chrono>
 #include<unistd.h> 
+#include <variant>
 
 struct Block {
     sf::RectangleShape shape;
     sf::Text num_text;
     sf::Text index;
+    int value;
 };
 
 enum SortType {
@@ -28,13 +30,19 @@ class Array {
     bool change_made = false;
     sf::RectangleShape block_add;
     sf::RectangleShape block_remove;
-
+    std::vector<std::variant<sf::CircleShape, sf::Text>> temp_drawables;
     int value_edit_index = -1;
-    
-    SortType sort_type = SortType::NONE;
-    bool swapBlocks(int i, int j);
-    std::vector<sf::CircleShape> temp_drawables;
+
+    void setValue(Block &block, int value = INT32_MIN);
+
+    void insertAt(int val, int index, bool overload);
+    void remove(int index, bool overload);
+
+    void swapBlocks(int i, int j);
+    void moveBlock(int index, sf::Vector2f to);
     void selectionSort();
+    void bubbleSort();
+    void insertionSort();
 
 public:
     Array(sf::RenderWindow &window, sf::Font &font);
@@ -44,7 +52,10 @@ public:
     void setBlockSize(int size);
     void handleClick(float mouseX, float mouseY);
     void handleKeypress(char key);
+    
     void sort(SortType type);
+    void insertAt(int val, int index);
+    void remove(int index);
 };
 
 #endif
