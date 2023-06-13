@@ -6,8 +6,8 @@
 #include <vector>
 #include <thread>
 #include <chrono>
-#include<unistd.h> 
 #include <variant>
+#include <math.h>
 
 struct Block {
     sf::RectangleShape shape;
@@ -28,6 +28,7 @@ class Array {
     int block_size = 75;
     int value_char_size = 36;
     bool change_made = false;
+    bool hide_index = false;
     sf::RectangleShape block_add;
     sf::RectangleShape block_remove;
     std::vector<std::variant<sf::CircleShape, sf::Text>> temp_drawables;
@@ -43,6 +44,7 @@ class Array {
     void selectionSort();
     void bubbleSort();
     void insertionSort();
+    void mergeSort();
 
 public:
     Array(sf::RenderWindow &window, sf::Font &font);

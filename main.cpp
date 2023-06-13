@@ -42,12 +42,17 @@ int main() {
                 window.close();
             }
             // Triggering test events
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
-                // array.setBlockSize(50);
-                // array.sort(SortType::INSERTION);
-                // array.sort(SortType::SELECTION);
-                // array.insertAt(9, 4);
-                array.remove(1);
+            
+            if (event.type == sf::Event::KeyReleased) {
+                if (event.key.code == sf::Keyboard::T) {
+                    // array.setBlockSize(50);
+                    // array.sort(SortType::INSERTION);
+                    // array.sort(SortType::SELECTION);
+                    // array.insertAt(9, 4);
+                    // array.remove(1);
+                    array.sort(SortType::MERGE);
+                }
+                
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {
