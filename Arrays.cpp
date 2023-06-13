@@ -393,7 +393,7 @@ void Array::mergeSort() {
     // This is a badly optimized iterative merge sort I came up with. 
     // This sort works on a breadth-first basis and thus makes easier to animate rather than the usual depth-first approach of the recursive merge sort.
     while (states.size() > 1) {
-        max_width = array.size() * block_size + (states.size() - 2) * block_size;
+        max_width = array.size() * block_size + (ceil(states.size()/2.0) - 1) * block_size;
         start_x = (window_size.x - max_width) / 2;
         for (int it = 0; it < states.size(); it++) {
             // Handle the singleton left with no other to compare with
