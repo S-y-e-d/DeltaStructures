@@ -22,15 +22,15 @@ void Array::addBlock(int value) {
 
 Array::Array(sf::RenderWindow &window, sf::Font &font) : window(window), font(font) {
     window_size = {window.getSize().x, window.getSize().y};
-    
+
     // block add/remove are the two ends of the array that add/remove blocks from it
     block_add = sf::RectangleShape(sf::Vector2f(block_size / 3, block_size));
-    block_add.setFillColor(sf::Color::Green);
+    block_add.setFillColor(sf::Color::Cyan);
     block_add.setOutlineThickness(-2.0);
     block_remove = sf::RectangleShape(sf::Vector2f(block_size / 3, block_size));
-    block_remove.setFillColor(sf::Color::Red);
+    block_remove.setFillColor(sf::Color::Magenta);
     block_remove.setOutlineThickness(-2.0);
-    
+
     // The variable that forces the entire array structure to be updated. Did this so don't have to constantly update and recalculate all positions every frame.
     change_made = true;
 }
@@ -113,6 +113,21 @@ void Array::setValue(Block &block, int value) {
     block.num_text.setPosition(block.shape.getPosition().x + (block_size - value_width) - padding, block.shape.getPosition().y + (block_size - value_height) - padding);
 }
 
+void Array::randomize() {
+    srand(time(0));
+    std::vector<int> temp_arr(array.size());
+    for (int i = 0; i < temp_arr.size(); i++) {
+        temp_arr[i] = i + 1;
+    }
+    for (int i = 0; i < temp_arr.size(); i++) {
+        std::swap(temp_arr[i], temp_arr[rand() % temp_arr.size()]);
+    }
+    for (int i = 0; i < array.size(); i++) {
+        setValue(array[i], temp_arr[i]);
+    }
+    change_made = true;
+}
+
 void Array::handleKeypress(char key) {
     // If editing the value of a block
     if (value_edit_index != -1) {
@@ -137,7 +152,6 @@ void Array::handleKeypress(char key) {
 
 void Array::insertAt(int val, int index, bool overload) {
     using namespace std::chrono_literals;
-    static bool in_progress = false;
     if (in_progress) return;
     in_progress = true;
 
@@ -179,7 +193,6 @@ void Array::insertAt(int val, int index) {
 void Array::remove(int index, bool overload) {
     using namespace std::chrono_literals;
 
-    static bool in_progress = false;
     if (in_progress) return;
     in_progress = true;
 
@@ -229,7 +242,6 @@ void Array::swapBlocks(int i, int j) {
 
 void Array::selectionSort() {
     using namespace std::chrono_literals;
-    static bool in_progress = false;
     if (in_progress) return;
     in_progress = true;
     // Circles representing i and j pointers
@@ -264,7 +276,6 @@ void Array::selectionSort() {
 void Array::bubbleSort() {
     using namespace std::chrono_literals;
 
-    static bool in_progress = false;
     if (in_progress) return;
     in_progress = true;
 
@@ -300,7 +311,6 @@ void Array::bubbleSort() {
 void Array::insertionSort() {
     using namespace std::chrono_literals;
 
-    static bool in_progress = false;
     if (in_progress) return;
     in_progress = true;
 
@@ -347,7 +357,6 @@ void Array::moveBlock(int index, sf::Vector2f to) {
 void Array::mergeSort() {
     using namespace std::chrono_literals;
 
-    static bool in_progress = false;
     if (in_progress) return;
     in_progress = true;
     std::vector<std::vector<int>> states;
@@ -375,11 +384,10 @@ void Array::mergeSort() {
         states.push_back(temp);
     }
 
-
     hide_index = true;
     float max_width = array.size() * block_size + (states.size() - 1) * block_size;
     float start_x = (window_size.x - max_width) / 2;
-    
+
     // move array blocks to the highest position to start sorting.
     for (auto &arr : states) {
         for (int &idx : arr) {
@@ -390,10 +398,10 @@ void Array::mergeSort() {
     }
     start_y += step_size_y;
     std::this_thread::sleep_for(1s);
-    // This is a badly optimized iterative merge sort I came up with. 
+    // This is a badly optimized iterative merge sort I came up with.
     // This sort works on a breadth-first basis and thus makes easier to animate rather than the usual depth-first approach of the recursive merge sort.
     while (states.size() > 1) {
-        max_width = array.size() * block_size + (ceil(states.size()/2.0) - 1) * block_size;
+        max_width = array.size() * block_size + (ceil(states.size() / 2.0) - 1) * block_size;
         start_x = (window_size.x - max_width) / 2;
         for (int it = 0; it < states.size(); it++) {
             // Handle the singleton left with no other to compare with
@@ -459,7 +467,7 @@ void Array::mergeSort() {
         start_y += step_size_y;
     }
     // Since there was no sorting of the real array, just sort the real array somehow and update it.
-    // Could've done this better 
+    // Could've done this better
     std::sort(array.begin(), array.end(), [](Block a, Block b) {
         return a.value < b.value;
     });
@@ -471,6 +479,9 @@ void Array::mergeSort() {
 
 // The function that is callable from outside, calls sort threads.
 void Array::sort(SortType type) {
+    for(auto &block: array) {
+        block.shape.setOutlineColor(sf::Color::White);
+    }
     switch (type) {
         case SortType::SELECTION:
             std::thread(&Array::selectionSort, this).detach();
@@ -489,6 +500,19 @@ void Array::sort(SortType type) {
     }
 }
 
+void Array::makeGradient() {
+    using namespace std::chrono_literals;
+    std::this_thread::sleep_for(100ms);
+    int r = 255, g = 0, b = 255;
+    int gradient = (array.size() > 1) ? array.size() - 1 : 1;
+    for (auto &block : array) {
+        block.shape.setOutlineColor(sf::Color(r, g, b, 255));
+        r -= 255 / gradient;
+        g += 255 / gradient;
+        std::this_thread::sleep_for(50ms);
+    }
+}
+
 void Array::update() {
     if (change_made) {
         // Reset positions of everything by recalculating the middle of the page.
@@ -498,17 +522,15 @@ void Array::update() {
         block_remove.setPosition(x - block_size / 3, y);
 
         int padding = 10;
-
         for (auto &block : array) {
             block.shape.setPosition(x + block_size * i, y);
             block.index.setString(std::to_string(i));
             block.index.setPosition(x + block_size * i + padding, y);
-
             setValue(block);
             i++;
         }
         block_add.setPosition(x + block_size * i, y);
-
+        std::thread(&Array::makeGradient, this).detach();
         change_made = false;
     }
     window.draw(block_add);

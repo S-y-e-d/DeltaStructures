@@ -12,7 +12,7 @@ int main() {
     window.setFramerateLimit(60);
 
     sf::Font font;
-    if (!font.loadFromFile("./assets/DejaVuSansMono.ttf")){
+    if (!font.loadFromFile("./assets/DejaVuSansMono.ttf")) {
         std::cout << "Error: Couldn't load font\n";
         return 0;
     }
@@ -22,37 +22,31 @@ int main() {
     lpanel.getPanel().setFillColor(sf::Color::White);
     lpanel.setStates(sf::Vector2f(-130, 0), sf::Vector2f(0, 0));
 
-    lpanel.addComponent(10, 3, sf::Color::Black, State{sf::Vector2f(137, window_size.y/2-5), 90}, State{sf::Vector2f(137, window_size.y/2-5), 270});
-    Array array(window, font);
-    array.addBlock(3);
-    array.addBlock(5);
-    array.addBlock(4);
-    array.addBlock(2);
+    lpanel.addComponent(10, 3, sf::Color::Black, State{sf::Vector2f(137, window_size.y / 2 - 5), 90}, State{sf::Vector2f(137, window_size.y / 2 - 5), 270});
+    // Array array(window, font);
+    LinkedList list(window, font);
 
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
-            }else if(event.type == sf::Event::TextEntered) {
-                array.handleKeypress(event.text.unicode);
+            } else if (event.type == sf::Event::TextEntered) {
+                // array.handleKeypress(event.text.unicode);
             }
             // Detecting keyboard input
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
                 window.close();
             }
             // Triggering test events
-            
+
             if (event.type == sf::Event::KeyReleased) {
                 if (event.key.code == sf::Keyboard::T) {
-                    // array.setBlockSize(50);
-                    // array.sort(SortType::INSERTION);
-                    // array.sort(SortType::SELECTION);
-                    // array.insertAt(9, 4);
-                    // array.remove(1);
-                    array.sort(SortType::MERGE);
+                    // array.sort(SortType::MERGE);
                 }
-                
+                if (event.key.code == sf::Keyboard::R) {
+                    // array.randomize();
+                }
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {
@@ -61,12 +55,13 @@ int main() {
                     sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
                     sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
                     lpanel.handleClick(worldPos.x, worldPos.y);
-                    array.handleClick(worldPos.x, worldPos.y);
+                    // array.handleClick(worldPos.x, worldPos.y);
                 }
             }
         }
         window.clear();
-        array.update();
+        // array.update();
+        list.update();
         lpanel.update(window);
         window.display();
     }
