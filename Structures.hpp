@@ -1,23 +1,25 @@
 #ifndef Structures_hpp
 #define Structures_hpp
 
+#include <math.h>
 
 #include <SFML/Graphics.hpp>
-#include <math.h>
 #include <chrono>
 #include <iostream>
 #include <thread>
 #include <variant>
 #include <vector>
 
-struct Block {
+struct Block
+{
     sf::RectangleShape shape;
     sf::Text num_text;
     sf::Text index;
     int value;
 };
 
-enum SortType {
+enum SortType
+{
     NONE,
     BUBBLE,
     INSERTION,
@@ -25,7 +27,8 @@ enum SortType {
     MERGE
 };
 
-class Array {
+class Array
+{
     std::vector<Block> array;
     sf::RenderWindow &window;
     sf::Font &font;
@@ -68,26 +71,28 @@ public:
     void remove(int index);
 };
 
-
-struct NodeSize{
+struct NodeSize
+{
     float value_width;
     float ptr_width;
     float width;
     float height;
 };
 
-struct Node {
+struct Node
+{
     sf::RectangleShape value_box;
     sf::RectangleShape ptr_box;
-    sf::Vertex connector_line[2] = {sf::Vertex(sf::Vector2f(0, 0)), sf::Vertex(sf::Vector2f(0, 0))};
     sf::CircleShape ptr_dot;
     sf::CircleShape self_dot;
     sf::Text value_text;
     int value;
 };
 
-class LinkedList {
+class LinkedList
+{
     std::vector<Node> list;
+    std::vector<std::pair<sf::Vertex, sf::Vertex>> connector_lines;
     sf::RenderWindow &window;
     sf::Font &font;
     sf::Vector2u window_size;
@@ -96,16 +101,23 @@ class LinkedList {
     bool in_progress = false;
     int value_char_size = 36;
     int value_edit_index = -1;
+    std::vector<std::variant<sf::CircleShape, sf::Text>> temp_drawables;
+    std::vector<Node> temp_nodes;
 
     void setValue(Node &node, int value);
+
+    void insert(int value, int after, bool thread);
+    void moveNode(Node &node, sf::Vector2f to);
 
 public:
     LinkedList(sf::RenderWindow &, sf::Font &);
     void addNode(int value, int idx);
-    void removeNode();
-    void handleClick();
-    void handleKeypress();
+    void removeNode(int idx); // default - 1
+    void handleClick(float mouseX, float mouseY);
+    void handleKeypress(char key);
     void update();
+
+    void insert(int value, int after);
 };
 
 #endif
