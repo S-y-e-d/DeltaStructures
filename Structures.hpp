@@ -107,7 +107,7 @@ class LinkedList
     void setValue(Node &node, int value);
 
     void insert(int value, int after, bool thread);
-    void moveNode(Node &node, sf::Vector2f to);
+    void moveNode(Node &node, sf::Vector2f to, int velocity = 1, bool relative = false); // default velocity = 1
 
 public:
     LinkedList(sf::RenderWindow &, sf::Font &);

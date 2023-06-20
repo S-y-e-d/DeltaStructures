@@ -54,7 +54,7 @@ int main()
                 if (event.key.code == sf::Keyboard::T)
                 {
                     // array.sort(SortType::MERGE);
-                    list.insert(0, 0);
+                    list.insert(7, 3);
                 }
                 if (event.key.code == sf::Keyboard::R)
                 {

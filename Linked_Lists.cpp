@@ -162,38 +162,54 @@ void LinkedList::setValue(Node &node, int value = INT32_MIN)
     node.value_text.setPosition(x_pos, y_pos);
 }
 
-void LinkedList::moveNode(Node &node, sf::Vector2f to) // temp node default null
+void LinkedList::moveNode(Node &node, sf::Vector2f to, int vel, bool relative) // vel = 1, relative = false
 {
     using namespace std::chrono_literals;
 
+    if (relative)
+    {
+        to += node.value_box.getPosition();
+    }
+
     sf::Vector2f displacement = to - node.value_box.getPosition();
-    sf::Vector2f velocity(displacement.x / 100, displacement.y / 100);
-    for (int i = 0; i < 100; i++)
+    sf::Vector2f velocity(displacement.x / 100 * vel, displacement.y / 100 * vel);
+
+    // Finding the before and after points to be moved to adjust connector lines
+    int cnn_idx = 0;
+    sf::Vector2f *connector_self = nullptr;
+    sf::Vector2f *connector_ptr = nullptr;
+    while (cnn_idx < connector_lines.size() and !node.ptr_box.getGlobalBounds().contains(connector_lines[cnn_idx].first.position))
+    {
+        cnn_idx++;
+    }
+    if (cnn_idx < connector_lines.size())
+    {
+        connector_ptr = &connector_lines[cnn_idx].first.position;
+    }
+    cnn_idx = 0;
+    while (cnn_idx < connector_lines.size() and !node.value_box.getGlobalBounds().contains(connector_lines[cnn_idx].second.position))
+    {
+        cnn_idx++;
+    }
+    if (cnn_idx < connector_lines.size())
+    {
+        connector_self = &connector_lines[cnn_idx].second.position;
+    }
+    for (int i = 0; i < 100 / vel; i++)
     {
         node.ptr_box.move(velocity.x, velocity.y);
         node.ptr_dot.move(velocity.x, velocity.y);
         node.self_dot.move(velocity.x, velocity.y);
         node.value_box.move(velocity.x, velocity.y);
         node.value_text.move(velocity.x, velocity.y);
-        int cnn_idx = 0;
-        while (cnn_idx < connector_lines.size() and !node.ptr_box.getGlobalBounds().contains(connector_lines[cnn_idx].first.position))
+        if (connector_self != nullptr)
         {
-            cnn_idx++;
+            *connector_self += velocity;
         }
-        if (cnn_idx < connector_lines.size())
+        if (connector_ptr != nullptr)
         {
-            auto &self_dot_line = connector_lines[cnn_idx - 1].second.position;
-            auto &ptr_dot_line = connector_lines[cnn_idx].first.position;
-            if (cnn_idx != 0)
-            {
-                self_dot_line = {self_dot_line.x + velocity.x, self_dot_line.y + velocity.y};
-            }
-            if (cnn_idx != connector_lines.size())
-            {
-                ptr_dot_line = {ptr_dot_line.x + velocity.x, ptr_dot_line.y + velocity.y};
-            }
+            *connector_ptr += velocity;
         }
-
         std::this_thread::sleep_for(10ms);
     }
 }
@@ -207,26 +223,101 @@ void LinkedList::insert(int value, int after, bool thread)
     }
     in_progress = true;
 
-    int i = 0;
-    Node temp_node = list[0];
-    temp_node.ptr_box.move(0, -100);
-    temp_node.ptr_dot.move(0, -100);
-    temp_node.self_dot.move(0, -100);
-    temp_node.value_box.move(0, -100);
-    temp_node.value_text.move(0, -100);
-    temp_nodes.push_back(temp_node);
-    moveNode(temp_nodes[0], sf::Vector2f(100, 100));
-    temp_nodes.clear();
+    temp_nodes.push_back(list[0]);
+    Node &temp_node = temp_nodes[0];
+    temp_node.ptr_box.move(0, 100);
+    temp_node.ptr_dot.move(0, 100);
+    temp_node.self_dot.move(0, 100);
+    temp_node.value_box.move(0, 100);
+    temp_node.value_text.move(0, 100);
+    setValue(temp_node, value);
 
-    while (i != after)
+    int i = 0;
+    std::this_thread::sleep_for(1s);
+
+    while (i < after)
     {
         i++;
+        moveNode(temp_node, sf::Vector2f(node_size.width + node_size.ptr_width, 0), 2, true);
         std::this_thread::sleep_for(1s);
     }
+
+    // drawing the connection lines
+    if (after < list.size() - 1)
+    {
+        Node &next_node = list[after + 1];
+        connector_lines.push_back({temp_node.ptr_dot.getPosition() + sf::Vector2f(5, 5),
+                                   next_node.self_dot.getPosition() + sf::Vector2f(5, 5)});
+
+        std::pair<sf::Vertex, sf::Vertex> &line = connector_lines.back();
+        // make the connector line stretch to the position
+        sf::Vector2f vel((line.second.position.x - line.first.position.x) / 50, (line.second.position.y - line.first.position.y) / 50);
+        line.second.position = line.first.position;
+        for (int i = 0; i < 50; i++)
+        {
+            line.second.position = line.second.position + sf::Vector2f(vel.x, vel.y);
+            std::this_thread::sleep_for(5ms);
+        }
+
+        std::this_thread::sleep_for(1s);
+    }
+    if (after != -1)
+    {
+        Node &prev_node = list[after];
+
+        sf::Vector2f vel((connector_lines[after].second.position.x - connector_lines[after].first.position.x) / 50,
+                         (connector_lines[after].second.position.y - connector_lines[after].first.position.y) / 50);
+        // Retract the already connected line
+        for (int i = 0; i < 50; i++)
+        {
+            connector_lines[after].second.position -= vel;
+            std::this_thread::sleep_for(5ms);
+        }
+        if(after < connector_lines.size()){
+            connector_lines.erase(connector_lines.begin() + after);
+        }
+
+        connector_lines.push_back({prev_node.ptr_dot.getPosition() + sf::Vector2f(5, 5),
+                                   temp_node.self_dot.getPosition() + sf::Vector2f(5, 5)});
+
+        std::pair<sf::Vertex, sf::Vertex> &line = connector_lines.back();
+        vel = {(line.second.position.x - line.first.position.x) / 50, (line.second.position.y - line.first.position.y) / 50};
+        line.second.position = line.first.position;
+        // Extend the line to connect
+        for (int i = 0; i < 50; i++)
+        {
+            line.second.position += sf::Vector2f(vel.x, vel.y);
+            std::this_thread::sleep_for(10ms);
+        }
+
+        std::this_thread::sleep_for(1s);
+    }
+
+    for (int i = 0; i <= after; i++)
+    {
+        moveNode(list[i], sf::Vector2f(-(node_size.width + node_size.ptr_width) / 2, 0), 4, true);
+    }
+    for (int i = after + 1; i < list.size(); i++)
+    {
+        moveNode(list[i], sf::Vector2f((node_size.width + node_size.ptr_width) / 2, 0), 4, true);
+    }
+
+    sf::Vector2f final_position = list[after].value_box.getPosition() + sf::Vector2f(node_size.width + node_size.ptr_width, 0);
+    
+    moveNode(temp_node, final_position, 2);
+
+    if (after < list.size() - 1)
+    {
+        list.insert(list.begin() + after + 1, temp_node);
+    }
+    else
+    {
+        list.push_back(temp_node);
+    }
+
     temp_nodes.clear();
-    // change_made = true;
-    // move the ptr of new node to the next node and move the ptr of the prev node to the new node
-    // shift the nodes left and right and slide the new node in position
+    change_made = true;
+    in_progress = false;
 }
 
 void LinkedList::insert(int value, int after)
@@ -285,6 +376,7 @@ void LinkedList::update()
                    { window.draw(drawable); },
                    temp);
     }
+
     for (auto &node : temp_nodes)
     {
         window.draw(node.ptr_box);
