@@ -5,20 +5,17 @@
 #include <iostream>
 #include <vector>
 
-struct State
-{
+struct State {
     sf::Vector2f pos;
     int rotation;
 };
-struct Component
-{
+struct Component {
     sf::CircleShape shape;
     State state_1;
     State state_2;
 };
 
-class Panel
-{
+class Panel {
     sf::RectangleShape panel;
     sf::Vector2f pos;
     sf::Vector2f state_1;

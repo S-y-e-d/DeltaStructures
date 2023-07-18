@@ -3,8 +3,7 @@
 
 // refactor panels to use threads and use move instead of set positions.
 
-int main()
-{
+int main() {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8.0;
     sf::Vector2i window_size(1920, 1080);
@@ -13,8 +12,7 @@ int main()
     window.setFramerateLimit(60);
 
     sf::Font font;
-    if (!font.loadFromFile("./assets/DejaVuSansMono.ttf"))
-    {
+    if (!font.loadFromFile("./assets/DejaVuSansMono.ttf")) {
         std::cout << "Error: Couldn't load font\n";
         return 0;
     }
@@ -28,44 +26,34 @@ int main()
     // Array array(window, font);
     LinkedList list(window, font);
 
-    while (window.isOpen())
-    {
+    while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
                 window.close();
-            }
-            else if (event.type == sf::Event::TextEntered)
-            {
+            } else if (event.type == sf::Event::TextEntered) {
                 // array.handleKeypress(event.text.unicode);
                 list.handleKeypress(event.text.unicode);
             }
             // Detecting keyboard input
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-            {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
                 window.close();
             }
             // Triggering test events
 
-            if (event.type == sf::Event::KeyReleased)
-            {
-                if (event.key.code == sf::Keyboard::T)
-                {
+            if (event.type == sf::Event::KeyReleased) {
+                if (event.key.code == sf::Keyboard::T) {
                     // array.sort(SortType::MERGE);
-                    list.insert(7, 3);
+                    list.deleteNode(3);
+                    // list.insertAfter(7, 2);
                 }
-                if (event.key.code == sf::Keyboard::R)
-                {
+                if (event.key.code == sf::Keyboard::R) {
                     // array.randomize();
                 }
             }
 
-            if (event.type == sf::Event::MouseButtonPressed)
-            {
-                if (event.mouseButton.button == sf::Mouse::Left)
-                {
+            if (event.type == sf::Event::MouseButtonPressed) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
                     // Convert the position of the pixel to the relative coordinate of the original window
                     sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
                     sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);

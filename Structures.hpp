@@ -10,16 +10,14 @@
 #include <variant>
 #include <vector>
 
-struct Block
-{
+struct Block {
     sf::RectangleShape shape;
     sf::Text num_text;
     sf::Text index;
     int value;
 };
 
-enum SortType
-{
+enum SortType {
     NONE,
     BUBBLE,
     INSERTION,
@@ -27,8 +25,7 @@ enum SortType
     MERGE
 };
 
-class Array
-{
+class Array {
     std::vector<Block> array;
     sf::RenderWindow &window;
     sf::Font &font;
@@ -71,16 +68,14 @@ public:
     void remove(int index);
 };
 
-struct NodeSize
-{
+struct NodeSize {
     float value_width;
     float ptr_width;
     float width;
     float height;
 };
 
-struct Node
-{
+struct Node {
     sf::RectangleShape value_box;
     sf::RectangleShape ptr_box;
     sf::CircleShape ptr_dot;
@@ -89,8 +84,7 @@ struct Node
     int value;
 };
 
-class LinkedList
-{
+class LinkedList {
     std::vector<Node> list;
     std::vector<std::pair<sf::Vertex, sf::Vertex>> connector_lines;
     sf::RenderWindow &window;
@@ -106,18 +100,21 @@ class LinkedList
 
     void setValue(Node &node, int value);
 
+    void moveNode(Node &node, sf::Vector2f to, int velocity = 1, bool relative = false);  // default velocity = 1
+    
     void insert(int value, int after, bool thread);
-    void moveNode(Node &node, sf::Vector2f to, int velocity = 1, bool relative = false); // default velocity = 1
+    void deleteNode(int index, bool thread);
 
 public:
     LinkedList(sf::RenderWindow &, sf::Font &);
     void addNode(int value, int idx);
-    void removeNode(int idx); // default - 1
+    void removeNode(int idx);  // default - 1
     void handleClick(float mouseX, float mouseY);
     void handleKeypress(char key);
     void update();
 
-    void insert(int value, int after);
+    void insertAfter(int value, int after);
+    void deleteNode(int index);
 };
 
 #endif
