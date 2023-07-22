@@ -24,7 +24,7 @@ int main() {
 
     lpanel.addComponent(10, 3, sf::Color::Black, State{sf::Vector2f(137, window_size.y / 2 - 5), 90}, State{sf::Vector2f(137, window_size.y / 2 - 5), 270});
     // Array array(window, font);
-    LinkedList list(window, font);
+    structures::LinkedList list(window, font);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -44,7 +44,7 @@ int main() {
             if (event.type == sf::Event::KeyReleased) {
                 if (event.key.code == sf::Keyboard::T) {
                     // array.sort(SortType::MERGE);
-                    list.deleteNode(3);
+                    list.deleteNode(1);
                     // list.insertAfter(7, 2);
                 }
                 if (event.key.code == sf::Keyboard::R) {

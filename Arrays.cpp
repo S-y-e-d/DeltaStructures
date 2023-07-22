@@ -1,7 +1,7 @@
 #include "Structures.hpp"
 
 // function to add a new block to the array
-void Array::addBlock(int value) {
+void structures::Array::addBlock(int value) {
     Block block;
     block.shape = sf::RectangleShape(sf::Vector2f(block_size, block_size));
     block.shape.setFillColor(sf::Color::Transparent);
@@ -20,7 +20,7 @@ void Array::addBlock(int value) {
     change_made = true;
 }
 
-Array::Array(sf::RenderWindow &window, sf::Font &font) : window(window), font(font) {
+structures::Array::Array(sf::RenderWindow &window, sf::Font &font) : window(window), font(font) {
     window_size = {window.getSize().x, window.getSize().y};
 
     // block add/remove are the two ends of the array that add/remove blocks from it
@@ -35,13 +35,13 @@ Array::Array(sf::RenderWindow &window, sf::Font &font) : window(window), font(fo
     change_made = true;
 }
 
-void Array::removeBlock() {
+void structures::Array::removeBlock() {
     array.pop_back();
     change_made = true;
 }
 
 // function to adjust the size of the individual blocks.
-void Array::setBlockSize(int size) {
+void structures::Array::setBlockSize(int size) {
     block_size = size;
     for (auto &block : array) {
         block.shape.setSize(sf::Vector2f(size, size));
@@ -49,7 +49,7 @@ void Array::setBlockSize(int size) {
     change_made = true;
 }
 
-void Array::handleClick(float mouseX, float mouseY) {
+void structures::Array::handleClick(float mouseX, float mouseY) {
     for (auto &block : array) {
         // if mouse is clicked inside array block
         if (block.shape.getGlobalBounds().contains(mouseX, mouseY)) {
@@ -83,7 +83,7 @@ void Array::handleClick(float mouseX, float mouseY) {
 }
 
 // Set the numerical value of the block
-void Array::setValue(Block &block, int value) {
+void structures::Array::setValue(Block &block, int value) {
     int padding = 10;
     // The default value of value is set to INT32_MIN. This was done to update the block characters without changing the value, in case of a size change only.
     if (value != INT32_MIN) {
@@ -114,7 +114,7 @@ void Array::setValue(Block &block, int value) {
     block.num_text.setPosition(xpos, ypos);
 }
 
-void Array::randomize() {
+void structures::Array::randomize() {
     srand(time(0));
     std::vector<int> temp_arr(array.size());
     for (int i = 0; i < temp_arr.size(); i++) {
@@ -129,7 +129,7 @@ void Array::randomize() {
     change_made = true;
 }
 
-void Array::handleKeypress(char key) {
+void structures::Array::handleKeypress(char key) {
     // If editing the value of a block
     if (value_edit_index != -1) {
         Block &block = array[value_edit_index];
@@ -154,7 +154,7 @@ void Array::handleKeypress(char key) {
     }
 }
 
-void Array::insertAt(int val, int index, bool overload) {
+void structures::Array::insertAt(int val, int index, bool overload) {
     using namespace std::chrono_literals;
     if (in_progress)
         return;
@@ -190,12 +190,12 @@ void Array::insertAt(int val, int index, bool overload) {
     in_progress = false;
 }
 
-void Array::insertAt(int val, int index) {
+void structures::Array::insertAt(int val, int index) {
     void (Array::*func)(int, int, bool) = &Array::insertAt;
     std::thread(func, this, val, index, true).detach();
 }
 
-void Array::remove(int index, bool overload) {
+void structures::Array::remove(int index, bool overload) {
     using namespace std::chrono_literals;
 
     if (in_progress)
@@ -224,12 +224,12 @@ void Array::remove(int index, bool overload) {
     in_progress = false;
 }
 
-void Array::remove(int index) {
+void structures::Array::remove(int index) {
     void (Array::*func)(int, bool) = &Array::remove;
     std::thread(func, this, index, true).detach();
 }
 
-void Array::swapBlocks(int i, int j) {
+void structures::Array::swapBlocks(int i, int j) {
     // swap two blocks within 100 steps with 10ms interval to get a time of around 1 second.
     using namespace std::chrono_literals;
     std::this_thread::sleep_for(1s);
@@ -247,7 +247,7 @@ void Array::swapBlocks(int i, int j) {
     std::swap(array[i], array[j]);
 }
 
-void Array::selectionSort() {
+void structures::Array::selectionSort() {
     using namespace std::chrono_literals;
     if (in_progress)
         return;
@@ -281,7 +281,7 @@ void Array::selectionSort() {
     in_progress = false;
 }
 
-void Array::bubbleSort() {
+void structures::Array::bubbleSort() {
     using namespace std::chrono_literals;
 
     if (in_progress)
@@ -317,7 +317,7 @@ void Array::bubbleSort() {
     in_progress = false;
 }
 
-void Array::insertionSort() {
+void structures::Array::insertionSort() {
     using namespace std::chrono_literals;
 
     if (in_progress)
@@ -351,7 +351,7 @@ void Array::insertionSort() {
     in_progress = false;
 }
 
-void Array::moveBlock(int index, sf::Vector2f to) {
+void structures::Array::moveBlock(int index, sf::Vector2f to) {
     using namespace std::chrono_literals;
     Block &block = array[index];
     sf::Vector2f displacement(to.x - block.shape.getPosition().x, to.y - block.shape.getPosition().y);
@@ -364,7 +364,7 @@ void Array::moveBlock(int index, sf::Vector2f to) {
     }
 }
 
-void Array::mergeSort() {
+void structures::Array::mergeSort() {
     using namespace std::chrono_literals;
 
     if (in_progress)
@@ -487,7 +487,7 @@ void Array::mergeSort() {
 }
 
 // The function that is callable from outside, calls sort threads.
-void Array::sort(SortType type) {
+void structures::Array::sort(SortType type) {
     for (auto &block : array) {
         block.shape.setOutlineColor(sf::Color::White);
     }
@@ -509,7 +509,7 @@ void Array::sort(SortType type) {
     }
 }
 
-void Array::makeGradient() {
+void structures::Array::makeGradient() {
     using namespace std::chrono_literals;
     std::this_thread::sleep_for(100ms);
     int r = 255, g = 0, b = 255;
@@ -522,7 +522,7 @@ void Array::makeGradient() {
     }
 }
 
-void Array::update() {
+void structures::Array::update() {
     if (change_made) {
         // Reset positions of everything by recalculating the middle of the page.
         int x = (window_size.x - block_size * array.size()) / 2;

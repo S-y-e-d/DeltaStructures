@@ -1,6 +1,6 @@
 #include "Structures.hpp"
 
-void LinkedList::addNode(int value, int idx = -1) {
+void structures::LinkedList::addNode(int value, int idx = -1) {
     Node temp;
     temp.value_box = sf::RectangleShape(sf::Vector2f(node_size.value_width, node_size.height));
     temp.value_box.setFillColor(sf::Color::Transparent);
@@ -9,15 +9,14 @@ void LinkedList::addNode(int value, int idx = -1) {
     temp.ptr_box.setFillColor(sf::Color::Transparent);
     temp.ptr_box.setOutlineThickness(-2);
 
-    temp.value = value;
     temp.ptr_dot = sf::CircleShape(5);
-    temp.ptr_dot.setFillColor(sf::Color::Blue);
+    temp.ptr_dot.setFillColor(sf::Color::Cyan);
     temp.self_dot = sf::CircleShape(5);
-    temp.self_dot.setFillColor(sf::Color::Red);
+    temp.self_dot.setFillColor(sf::Color::Magenta);
+    
     temp.value_text.setFont(font);
-    temp.value_text.setCharacterSize(36);
-    temp.value_text.setString(std::to_string(value));
-
+    setValue(temp, value);
+    
     if (idx == -1) {
         list.push_back(temp);
     } else {
@@ -26,7 +25,7 @@ void LinkedList::addNode(int value, int idx = -1) {
     change_made = true;
 }
 
-LinkedList::LinkedList(sf::RenderWindow &window, sf::Font &font) : window(window), font(font) {
+structures::LinkedList::LinkedList(sf::RenderWindow &window, sf::Font &font) : window(window), font(font) {
     window_size = window.getSize();
     addNode(0);
     addNode(1);
@@ -34,7 +33,7 @@ LinkedList::LinkedList(sf::RenderWindow &window, sf::Font &font) : window(window
     addNode(3);
 }
 
-void LinkedList::removeNode(int idx = -1) {
+void structures::LinkedList::removeNode(int idx = -1) {
     if (list.size() > 1) {
         if (idx == -1) {
             list.pop_back();
@@ -45,7 +44,7 @@ void LinkedList::removeNode(int idx = -1) {
     }
 }
 
-void LinkedList::handleClick(float mouseX, float mouseY) {
+void structures::LinkedList::handleClick(float mouseX, float mouseY) {
     for (int i = 0; i < list.size(); i++) {
         Node &node = list[i];
         if (node.ptr_dot.getGlobalBounds().contains(mouseX, mouseY)) {
@@ -68,7 +67,7 @@ void LinkedList::handleClick(float mouseX, float mouseY) {
     }
 }
 
-void LinkedList::handleKeypress(char key) {
+void structures::LinkedList::handleKeypress(char key) {
     // If editing the value of a block
     if (value_edit_index != -1) {
         Node &node = list[value_edit_index];
@@ -93,7 +92,7 @@ void LinkedList::handleKeypress(char key) {
     }
 }
 
-void LinkedList::setValue(Node &node, int value = INT32_MIN) {
+void structures::LinkedList::setValue(Node &node, int value = INT32_MIN) {
     int padding = 10;
     // The default value of value is set to INT32_MIN. This was done to update the block characters without changing the value, in case of a size change only.
     if (value != INT32_MIN) {
@@ -130,10 +129,8 @@ void LinkedList::setValue(Node &node, int value = INT32_MIN) {
     node.value_text.setPosition(x_pos, y_pos);
 }
 
-void LinkedList::moveNode(Node &node, sf::Vector2f to, int vel, bool relative)  // vel = 1, relative (move w.r.t the entire list) = false
+void structures::LinkedList::moveNode(Node &node, sf::Vector2f to, int vel, bool relative)  // vel = 1, relative (move w.r.t the entire list) = false
 {
-    using namespace std::chrono_literals;
-
     if (relative) {
         to += node.value_box.getPosition();
     }
@@ -174,8 +171,7 @@ void LinkedList::moveNode(Node &node, sf::Vector2f to, int vel, bool relative)  
     }
 }
 
-void LinkedList::insert(int value, int after, bool thread) {
-    using namespace std::chrono_literals;
+void structures::LinkedList::insert(int value, int after, bool thread) {
     if (in_progress) {
         return;
     }
@@ -271,13 +267,12 @@ void LinkedList::insert(int value, int after, bool thread) {
     in_progress = false;
 }
 
-void LinkedList::insertAfter(int value, int after) {
+void structures::LinkedList::insertAfter(int value, int after) {
     void (LinkedList::*func)(int, int, bool) = &LinkedList::insert;
     std::thread(func, this, value, after, true).detach();
 }
 
-void LinkedList::deleteNode(int index, bool thread) {
-    using namespace std::chrono_literals;
+void structures::LinkedList::deleteNode(int index, bool thread) {
     if (in_progress) {
         return;
     }
@@ -307,7 +302,6 @@ void LinkedList::deleteNode(int index, bool thread) {
             connector_lines[index - 1].second.position += vel;
             std::this_thread::sleep_for(10ms);
         }
-        
     }
     // If there is something after the deleted, connnect to that
     if (index < list.size() - 1) {
@@ -322,8 +316,8 @@ void LinkedList::deleteNode(int index, bool thread) {
         // Retract the connecter from the node to be deleted
         vel = {(connector_lines[index].first.position.x - connector_lines[index].second.position.x) / 50,
                (connector_lines[index].first.position.y - connector_lines[index].second.position.y) / 50};
-        
-        for (int i = 0; i<50; i++){
+
+        for (int i = 0; i < 50; i++) {
             connector_lines[index].second.position += vel;
             std::this_thread::sleep_for(10ms);
         }
@@ -354,11 +348,11 @@ void LinkedList::deleteNode(int index, bool thread) {
     in_progress = false;
 }
 
-void LinkedList::deleteNode(int index) {
+void structures::LinkedList::deleteNode(int index) {
     void (LinkedList::*func)(int, bool) = &LinkedList::deleteNode;
     std::thread(func, this, index, true).detach();
 }
-void LinkedList::update() {
+void structures::LinkedList::update() {
     if (change_made) {
         float x_pos = window_size.x;                       // get the window width
         x_pos -= node_size.width * list.size();            // subtract the size of all the node blocks (value+ptr box)
@@ -382,10 +376,10 @@ void LinkedList::update() {
             }
             x_pos += node_size.width + node_size.ptr_width;
         }
-        // Mark the first element (head) as green
+        // Mark the first element (head) as yellow
         if (not list.empty()) {
-            list.front().ptr_box.setOutlineColor(sf::Color::Green);
-            list.front().value_box.setOutlineColor(sf::Color::Green);
+            list.front().ptr_box.setOutlineColor(sf::Color::Yellow);
+            list.front().value_box.setOutlineColor(sf::Color::Yellow);
         }
         change_made = false;
     }
@@ -398,14 +392,13 @@ void LinkedList::update() {
     }
     for (auto &line : connector_lines) {
         sf::Vertex l[2] = {line.first, line.second};
-        l[0].color = sf::Color::Blue;
-        l[1].color = sf::Color::Red;
+        l[0].color = sf::Color::Cyan;
+        l[1].color = sf::Color::Magenta;
         window.draw(l, 2, sf::Lines);
     }
 
     for (auto &temp : temp_drawables) {
-        std::visit([&](auto &&drawable) { window.draw(drawable); },
-                   temp);
+        std::visit([&](auto &&drawable) { window.draw(drawable); }, temp);
     }
 
     for (auto &node : temp_nodes) {

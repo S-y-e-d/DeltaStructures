@@ -10,111 +10,150 @@
 #include <variant>
 #include <vector>
 
-struct Block {
-    sf::RectangleShape shape;
-    sf::Text num_text;
-    sf::Text index;
-    int value;
-};
+namespace structures {
+    using namespace std::chrono_literals;
 
-enum SortType {
-    NONE,
-    BUBBLE,
-    INSERTION,
-    SELECTION,
-    MERGE
-};
+    class Array {
+        struct Block {
+            sf::RectangleShape shape;
+            sf::Text num_text;
+            sf::Text index;
+            int value;
+        };
 
-class Array {
-    std::vector<Block> array;
-    sf::RenderWindow &window;
-    sf::Font &font;
-    sf::Vector2u window_size;
-    int block_size = 75;
-    int value_char_size = 36;
-    bool change_made = false;
-    bool hide_index = false;
-    bool in_progress = false;
-    sf::RectangleShape block_add;
-    sf::RectangleShape block_remove;
-    std::vector<std::variant<sf::CircleShape, sf::Text>> temp_drawables;
-    int value_edit_index = -1;
+        enum SortType {
+            NONE,
+            BUBBLE,
+            INSERTION,
+            SELECTION,
+            MERGE
+        };
+        std::vector<Block> array;
+        sf::RenderWindow &window;
+        sf::Font &font;
+        sf::Vector2u window_size;
+        int block_size = 75;
+        int value_char_size = 36;
+        bool change_made = false;
+        bool hide_index = false;
+        bool in_progress = false;
+        sf::RectangleShape block_add;
+        sf::RectangleShape block_remove;
+        std::vector<std::variant<sf::CircleShape, sf::Text>> temp_drawables;
+        int value_edit_index = -1;
 
-    void setValue(Block &block, int value = INT32_MIN);
+        void setValue(Block &block, int value = INT32_MIN);
 
-    void insertAt(int val, int index, bool overload);
-    void remove(int index, bool overload);
+        void insertAt(int val, int index, bool overload);
+        void remove(int index, bool overload);
 
-    void swapBlocks(int i, int j);
-    void moveBlock(int index, sf::Vector2f to);
-    void selectionSort();
-    void bubbleSort();
-    void insertionSort();
-    void mergeSort();
-    void makeGradient();
+        void swapBlocks(int i, int j);
+        void moveBlock(int index, sf::Vector2f to);
+        void selectionSort();
+        void bubbleSort();
+        void insertionSort();
+        void mergeSort();
+        void makeGradient();
 
-public:
-    Array(sf::RenderWindow &window, sf::Font &font);
-    void addBlock(int value);
-    void removeBlock();
-    void update();
-    void randomize();
-    void setBlockSize(int size);
-    void handleClick(float mouseX, float mouseY);
-    void handleKeypress(char key);
+    public:
+        Array(sf::RenderWindow &window, sf::Font &font);
+        void addBlock(int value);
+        void removeBlock();
+        void update();
+        void randomize();
+        void setBlockSize(int size);
+        void handleClick(float mouseX, float mouseY);
+        void handleKeypress(char key);
 
-    void sort(SortType type);
-    void insertAt(int val, int index);
-    void remove(int index);
-};
+        void sort(SortType type);
+        void insertAt(int val, int index);
+        void remove(int index);
+    };
 
-struct NodeSize {
-    float value_width;
-    float ptr_width;
-    float width;
-    float height;
-};
+    class LinkedList {
+        struct NodeSize {
+            float value_width;
+            float ptr_width;
+            float width;
+            float height;
+        };
+        struct Node {
+            sf::RectangleShape value_box;
+            sf::RectangleShape ptr_box;
+            sf::CircleShape ptr_dot;
+            sf::CircleShape self_dot;
+            sf::Text value_text;
+            int value;
+        };
+        std::vector<Node> list;
+        std::vector<std::pair<sf::Vertex, sf::Vertex>> connector_lines;  // could refactor to include this in node
+        sf::RenderWindow &window;
+        sf::Font &font;
+        sf::Vector2u window_size;
+        NodeSize node_size = {75, 50, 125, 75};
+        bool change_made = false;
+        bool in_progress = false;
+        int value_char_size = 36;
+        int value_edit_index = -1;
+        std::vector<std::variant<sf::CircleShape, sf::Text>> temp_drawables;
+        std::vector<Node> temp_nodes;
 
-struct Node {
-    sf::RectangleShape value_box;
-    sf::RectangleShape ptr_box;
-    sf::CircleShape ptr_dot;
-    sf::CircleShape self_dot;
-    sf::Text value_text;
-    int value;
-};
+        void setValue(Node &node, int value);
 
-class LinkedList {
-    std::vector<Node> list;
-    std::vector<std::pair<sf::Vertex, sf::Vertex>> connector_lines;
-    sf::RenderWindow &window;
-    sf::Font &font;
-    sf::Vector2u window_size;
-    NodeSize node_size = {75, 50, 125, 75};
-    bool change_made = false;
-    bool in_progress = false;
-    int value_char_size = 36;
-    int value_edit_index = -1;
-    std::vector<std::variant<sf::CircleShape, sf::Text>> temp_drawables;
-    std::vector<Node> temp_nodes;
+        void moveNode(Node &node, sf::Vector2f to, int velocity = 1, bool relative = false);  // default velocity = 1
 
-    void setValue(Node &node, int value);
+        void insert(int value, int after, bool thread);
+        void deleteNode(int index, bool thread);
 
-    void moveNode(Node &node, sf::Vector2f to, int velocity = 1, bool relative = false);  // default velocity = 1
+    public:
+        LinkedList(sf::RenderWindow &, sf::Font &);
+        void addNode(int value, int idx);
+        void removeNode(int idx);  // default - 1
+        void handleClick(float mouseX, float mouseY);
+        void handleKeypress(char key);
+        void update();
+
+        void insertAfter(int value, int after);
+        void deleteNode(int index);
+    };
+
+    class Tree {
+        struct Node {
+            int value;
+            sf::Text value_text;
+            sf::RectangleShape value_box;
+            sf::RectangleShape l_box;
+            sf::RectangleShape r_box;
+            sf::CircleShape l_dot;
+            sf::CircleShape r_dot;
+            std::pair<sf::Vertex, sf::Vertex> l_connector;
+            std::pair<sf::Vertex, sf::Vertex> r_connector;
+        };
+        struct NodeSize {
+            float value_width;
+            float ptr_heigth;
+            float full_height;
+        };
+
+        std::vector<Node *> tree;  // used pointers because of array implementation of trees. Easier to detect nulls
+        sf::RenderWindow &window;
+        sf::Font &font;
+        sf::Vector2u window_size;
+        NodeSize node_size = {75, 25, 75 + 25};
+        bool change_made = false;
+        bool in_progress = false;
+        int value_char_size = 36;
+        int value_edit_index = -1;
+        std::vector<std::variant<sf::CircleShape, sf::Text>> temp_drawables;
+        std::vector<Node *> temp_nodes;
+
+        void update();
     
-    void insert(int value, int after, bool thread);
-    void deleteNode(int index, bool thread);
-
-public:
-    LinkedList(sf::RenderWindow &, sf::Font &);
-    void addNode(int value, int idx);
-    void removeNode(int idx);  // default - 1
-    void handleClick(float mouseX, float mouseY);
-    void handleKeypress(char key);
-    void update();
-
-    void insertAfter(int value, int after);
-    void deleteNode(int index);
-};
+    public:
+        Tree(sf::RenderWindow&, sf::Font&);
+        void addNode(int idx, int value);
+        void setValue(Node *node, int value = INT32_MIN);
+    };
+}
 
 #endif
