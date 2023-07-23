@@ -131,28 +131,43 @@ namespace structures {
         };
         struct NodeSize {
             float value_width;
-            float ptr_heigth;
-            float full_height;
+            float value_height;
+            float ptr_width;
+            float ptr_height;
         };
 
         std::vector<Node *> tree;  // used pointers because of array implementation of trees. Easier to detect nulls
+        
         sf::RenderWindow &window;
         sf::Font &font;
         sf::Vector2u window_size;
-        NodeSize node_size = {75, 25, 75 + 25};
+        
+        std::vector<std::variant<sf::CircleShape, sf::Text>> temp_drawables;
+        std::vector<Node *> temp_nodes;
+        // used to calculate the positions to draw the nodes on efficiently. 
+        std::vector<std::vector<int>> position_matrix; 
+
+        NodeSize node_size = {75, 51, 38, 25};
+        const int root = 1;
         bool change_made = false;
         bool in_progress = false;
         int value_char_size = 36;
         int value_edit_index = -1;
-        std::vector<std::variant<sf::CircleShape, sf::Text>> temp_drawables;
-        std::vector<Node *> temp_nodes;
 
-        void update();
+        int left(int node_idx);
+        int right(int node_idx);
+        int parent(int node_idx);
+        int width(int node_idx);
+        int depth(int node_idx);
+        int fillMatrix(int node_idx, int l, int r);
     
     public:
         Tree(sf::RenderWindow&, sf::Font&);
+        ~Tree();
         void addNode(int idx, int value);
         void setValue(Node *node, int value = INT32_MIN);
+        
+        void update();
     };
 }
 

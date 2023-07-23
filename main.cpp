@@ -24,7 +24,8 @@ int main() {
 
     lpanel.addComponent(10, 3, sf::Color::Black, State{sf::Vector2f(137, window_size.y / 2 - 5), 90}, State{sf::Vector2f(137, window_size.y / 2 - 5), 270});
     // Array array(window, font);
-    structures::LinkedList list(window, font);
+    // structures::LinkedList list(window, font);
+    structures::Tree tree(window, font);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -33,7 +34,7 @@ int main() {
                 window.close();
             } else if (event.type == sf::Event::TextEntered) {
                 // array.handleKeypress(event.text.unicode);
-                list.handleKeypress(event.text.unicode);
+                // list.handleKeypress(event.text.unicode);
             }
             // Detecting keyboard input
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
@@ -44,7 +45,7 @@ int main() {
             if (event.type == sf::Event::KeyReleased) {
                 if (event.key.code == sf::Keyboard::T) {
                     // array.sort(SortType::MERGE);
-                    list.deleteNode(1);
+                    // list.deleteNode(1);
                     // list.insertAfter(7, 2);
                 }
                 if (event.key.code == sf::Keyboard::R) {
@@ -59,13 +60,14 @@ int main() {
                     sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
                     lpanel.handleClick(worldPos.x, worldPos.y);
                     // array.handleClick(worldPos.x, worldPos.y);
-                    list.handleClick(worldPos.x, worldPos.y);
+                    // list.handleClick(worldPos.x, worldPos.y);
                 }
             }
         }
         window.clear();
         // array.update();
-        list.update();
+        // list.update();
+        tree.update();
         lpanel.update(window);
         window.display();
     }

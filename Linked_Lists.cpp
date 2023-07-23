@@ -113,7 +113,6 @@ void structures::LinkedList::setValue(Node &node, int value = INT32_MIN) {
             node.value_text.setCharacterSize(18);
             break;
         }
-        std::cout << charsize << std::endl;
         node.value_text.setCharacterSize(charsize - 1);
     }
 
@@ -123,8 +122,9 @@ void structures::LinkedList::setValue(Node &node, int value = INT32_MIN) {
     // This is to obtain the empty space between bounds and actual position. Else the text may not align properly.
     float text_height = value_bounds.height;
     float empty_space_above_text = value_bounds.top - node.value_text.getPosition().y;
+    float empty_space_side_text = value_bounds.left - node.value_text.getPosition().x;
     // Set the position of text as right aligned and bottom aligned.
-    int x_pos = node.value_box.getPosition().x + (node_size.value_width - text_width) / 2;
+    int x_pos = node.value_box.getPosition().x + (node_size.value_width - text_width) / 2 - empty_space_side_text;
     int y_pos = node.value_box.getPosition().y + (node_size.height - text_height) / 2 - empty_space_above_text;
     node.value_text.setPosition(x_pos, y_pos);
 }
