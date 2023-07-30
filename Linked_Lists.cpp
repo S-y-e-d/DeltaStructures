@@ -13,10 +13,10 @@ void structures::LinkedList::addNode(int value, int idx = -1) {
     temp.ptr_dot.setFillColor(sf::Color::Cyan);
     temp.self_dot = sf::CircleShape(5);
     temp.self_dot.setFillColor(sf::Color::Magenta);
-    
+
     temp.value_text.setFont(font);
     setValue(temp, value);
-    
+
     if (idx == -1) {
         list.push_back(temp);
     } else {
@@ -60,35 +60,35 @@ void structures::LinkedList::handleClick(float mouseX, float mouseY) {
             setValue(node, 0);
             value_edit_index = i;
             return;
-        } else {
-            value_edit_index = -1;
-            node.value_text.setFillColor(sf::Color::White);
         }
+        value_edit_index = -1;
+        node.value_text.setFillColor(sf::Color::White);
     }
 }
 
 void structures::LinkedList::handleKeypress(char key) {
     // If editing the value of a block
-    if (value_edit_index != -1) {
-        Node &node = list[value_edit_index];
-        // If pressed a number
-        if (isdigit(key)) {
-            if (node.value_text.getString() == "0") {
-                node.value_text.setString("");
-            }
-            if (node.value_text.getCharacterSize() <= 18) {
-                return;
-            }
-            setValue(node, stoi(std::string(node.value_text.getString() + key)));
-        } else if (key == '\b') {
-            std::string str = node.value_text.getString();
-            if (str.size() > 1) {
-                str.pop_back();
-            } else {
-                str = "0";
-            }
-            setValue(node, std::stoi(str));
+    if (value_edit_index == -1) {
+        return;
+    }
+    Node &node = list[value_edit_index];
+    // If pressed a number
+    if (isdigit(key)) {
+        if (node.value_text.getString() == "0") {
+            node.value_text.setString("");
         }
+        if (node.value_text.getCharacterSize() <= 18) {
+            return;
+        }
+        setValue(node, stoi(std::string(node.value_text.getString() + key)));
+    } else if (key == '\b') {
+        std::string str = node.value_text.getString();
+        if (str.size() > 1) {
+            str.pop_back();
+        } else {
+            str = "0";
+        }
+        setValue(node, std::stoi(str));
     }
 }
 

@@ -3,22 +3,25 @@
 structures::Tree::Tree(sf::RenderWindow &window, sf::Font &font) : window(window), font(font) {
     window_size = window.getSize();
 
-    // addNode(1, 5);
-    std::vector<int> tree_maker = {
-        1,
-        2, 3,
-        4, 5, 6, -1,
-        8, 9, 10, 11, -1, -1, -1, -1};
-    for (int i = 0; i < tree_maker.size(); i++) {
-        if (tree_maker[i] != -1)
-            addNode(i + 1, tree_maker[i]);
-    }
+    addNode(1, 5);
+    // std::vector<int> tree_maker = {
+    //     1,
+    //     2, 3,
+    //     4, 5, 6, -1,
+    //     8, 9, 10, 11, -1, -1, -1, -1};
+    // for (int i = 0; i < tree_maker.size(); i++) {
+    //     if (tree_maker[i] != -1)
+    //         addNode(i + 1, tree_maker[i]);
+    // }
 }
 
 void structures::Tree::addNode(int idx, int value) {
     if (idx >= tree.size()) {
         int depth = log2(idx);
         tree.resize(pow(2, depth + 1), nullptr);
+    }
+    if(tree[idx] != nullptr){
+        return;
     }
     Node *new_node = new Node;
     new_node->value = value;
@@ -27,17 +30,17 @@ void structures::Tree::addNode(int idx, int value) {
 
     new_node->value_box = sf::RectangleShape({node_size.value_width, node_size.value_height});
     new_node->value_box.setOutlineColor(sf::Color::White);
-    new_node->value_box.setOutlineThickness(-1);
+    new_node->value_box.setOutlineThickness(-2);
     new_node->value_box.setFillColor(sf::Color::Transparent);
 
     new_node->l_box = sf::RectangleShape({node_size.ptr_width, node_size.ptr_height});
     new_node->l_box.setOutlineColor(sf::Color::White);
-    new_node->l_box.setOutlineThickness(-1);
+    new_node->l_box.setOutlineThickness(-2);
     new_node->l_box.setFillColor(sf::Color::Transparent);
 
     new_node->r_box = sf::RectangleShape({node_size.ptr_width, node_size.ptr_height});
     new_node->r_box.setOutlineColor(sf::Color::White);
-    new_node->r_box.setOutlineThickness(-1);
+    new_node->r_box.setOutlineThickness(-2);
     new_node->r_box.setFillColor(sf::Color::Transparent);
 
     new_node->l_dot = sf::CircleShape(3);
@@ -48,6 +51,18 @@ void structures::Tree::addNode(int idx, int value) {
     setValue(new_node, value);
 
     tree[idx] = new_node;
+    change_made = true;
+}
+
+void structures::Tree::deleteNode(int idx) {
+    if(idx == 0){
+        return;
+    }
+    deleteNode(left(idx));
+    deleteNode(right(idx));
+
+    delete tree[idx];
+    tree[idx] = nullptr;
     change_made = true;
 }
 
@@ -142,7 +157,76 @@ int structures::Tree::fillMatrix(int node_idx, int l, int r) {
     return center;
 }
 
-void structures::Tree::update() {
+void structures::Tree::handleClick(float mouseX, float mouseY) {
+    if (mouseX == 0 and mouseY == 0) {
+        return;
+    }
+    bool left_click = true;
+    if (mouseX < 0) {
+        left_click = false;
+        mouseX = -mouseX;
+        mouseY = -mouseY;
+    }
+    for (int node = 1; node < tree.size(); node++) {
+        if (tree[node] == nullptr) {
+            continue;
+        }
+        if (tree[node]->value_box.getGlobalBounds().contains(mouseX, mouseY)) {
+            tree[node]->value_text.setFillColor(sf::Color::Yellow);
+            setValue(tree[node], 0);
+            value_edit_index = node;
+            return;
+        }
+        tree[node]->value_text.setFillColor(sf::Color::White);
+        value_edit_index = -1;
+
+        if (tree[node]->l_box.getGlobalBounds().contains(mouseX, mouseY)) {
+            if (left_click) {
+                addNode(node * 2, rand()%100);
+            } else {
+                deleteNode(node * 2);
+            }
+        }
+
+        if (tree[node]->r_box.getGlobalBounds().contains(mouseX, mouseY)) {
+            if (left_click) {
+                addNode(node * 2 + 1, rand()%100);
+            } else {
+                deleteNode(node * 2 + 1);
+            }
+        }
+    }
+}
+
+void structures::Tree::handleKeypress(char key) {
+    if (key == '\0' or value_edit_index == -1) {
+        return;
+    }
+    Node *node = tree[value_edit_index];
+    // If pressed a number
+    if (isdigit(key)) {
+        if (node->value_text.getString() == "0") {
+            node->value_text.setString("");
+        }
+        // Do nothing if the text is 18 size or smaller
+        if (node->value_text.getCharacterSize() <= 18) {
+            return;
+        }
+        setValue(node, stoi(std::string(node->value_text.getString() + key)));
+    } else if (key == '\b') {
+        std::string str = node->value_text.getString();
+        if (str.size() > 1) {
+            str.pop_back();
+        } else {
+            str = "0";
+        }
+        setValue(node, std::stoi(str));
+    }
+}
+
+void structures::Tree::update(int mouseX, int mouseY, char key) {
+    handleClick(mouseX, mouseY);
+    handleKeypress(key);
     if (change_made) {
         int max_width = width(root) * 2 - 1;
         int max_depth = log2(tree.size());
@@ -154,7 +238,7 @@ void structures::Tree::update() {
         }
         fillMatrix(root, 0, max_width);
 
-        int max_x = width(root) * node_size.value_width + ((width(root) - 1) * node_size.ptr_width);  // The width contains the spaces between nodes
+        int max_x = width(root) * (node_size.value_width + 20);  // The width contains the spaces between nodes
         if (max_x >= window_size.x - 100) {
             throw std::overflow_error("Max width reached");
         }
@@ -207,11 +291,11 @@ void structures::Tree::update() {
         }
 
         for (int i = 0; i < tree.size(); i++) {
-            if(tree[i] == nullptr){
+            if (tree[i] == nullptr) {
                 continue;
             }
             if (left(i)) {
-                tree[i]->l_connector.first = tree[i]->l_dot.getPosition() + sf::Vector2f(3, 3); // radius of the dot
+                tree[i]->l_connector.first = tree[i]->l_dot.getPosition() + sf::Vector2f(3, 3);  // radius of the dot
                 tree[i]->l_connector.second =
                     tree[left(i)]->value_box.getPosition() + sf::Vector2f(node_size.value_width / 2, 0) + sf::Vector2f(0, 0);
             } else {

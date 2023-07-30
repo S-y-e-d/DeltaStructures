@@ -4,6 +4,9 @@
 // refactor panels to use threads and use move instead of set positions.
 
 int main() {
+
+    srand(time(0));
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8.0;
     sf::Vector2i window_size(1920, 1080);
@@ -29,12 +32,14 @@ int main() {
 
     while (window.isOpen()) {
         sf::Event event;
+        int mouse_click_x = 0, mouse_click_y = 0;
+        char key_pressed = '\0';
         while (window.pollEvent(event)) {
+            
             if (event.type == sf::Event::Closed) {
                 window.close();
             } else if (event.type == sf::Event::TextEntered) {
-                // array.handleKeypress(event.text.unicode);
-                // list.handleKeypress(event.text.unicode);
+                key_pressed = event.text.unicode;
             }
             // Detecting keyboard input
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
@@ -54,20 +59,25 @@ int main() {
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {
+
+                sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
+                sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     // Convert the position of the pixel to the relative coordinate of the original window
-                    sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
-                    sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
                     lpanel.handleClick(worldPos.x, worldPos.y);
-                    // array.handleClick(worldPos.x, worldPos.y);
-                    // list.handleClick(worldPos.x, worldPos.y);
+                    mouse_click_x = worldPos.x;
+                    mouse_click_y = worldPos.y;
+                }else{
+                    // Using negative to show right click. Surely nothing can go wrong.
+                    mouse_click_x = -worldPos.x;
+                    mouse_click_y = -worldPos.y;
                 }
             }
         }
         window.clear();
-        // array.update();
-        // list.update();
-        tree.update();
+        // array.update(mouse_click_x, mouse_click_y, key_pressed);
+        // list.update(mouse_click_x, mouse_click_y, key_pressed);
+        tree.update(mouse_click_x, mouse_click_y, key_pressed);
         lpanel.update(window);
         window.display();
     }

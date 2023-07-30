@@ -117,6 +117,24 @@ namespace structures {
         void deleteNode(int index);
     };
 
+    // Can use this but I feel like this is unnecessary since the deletion is handled already
+    // template <typename T>
+    // class SmartPtr{
+    //     T ptr;
+    // public:
+    //     explicit SmartPtr(T *p) : ptr(p){}
+    //     ~SmartPtr(){
+    //         delete ptr;
+    //         ptr = nullptr;
+    //     }
+    //     T& operator*(){
+    //         return *ptr;
+    //     }
+    //     T* operator->(){
+    //         return ptr;
+    //     }
+    // };
+
     class Tree {
         struct Node {
             int value;
@@ -160,14 +178,18 @@ namespace structures {
         int width(int node_idx);
         int depth(int node_idx);
         int fillMatrix(int node_idx, int l, int r);
+        void handleClick(float mouseX, float mouseY);
+        void handleKeypress(char key);
+
     
     public:
         Tree(sf::RenderWindow&, sf::Font&);
         ~Tree();
         void addNode(int idx, int value);
+        void deleteNode(int idx);
         void setValue(Node *node, int value = INT32_MIN);
         
-        void update();
+        void update(int mouseX, int mouseY, char key);
     };
 }
 
