@@ -4,7 +4,6 @@
 // refactor panels to use threads and use move instead of set positions.
 
 int main() {
-
     srand(time(0));
 
     sf::ContextSettings settings;
@@ -26,16 +25,26 @@ int main() {
     lpanel.setStates(sf::Vector2f(-130, 0), sf::Vector2f(0, 0));
 
     lpanel.addComponent(10, 3, sf::Color::Black, State{sf::Vector2f(137, window_size.y / 2 - 5), 90}, State{sf::Vector2f(137, window_size.y / 2 - 5), 270});
-    // Array array(window, font);
-    // structures::LinkedList list(window, font);
+
+    structures::Array array(window, font);
+    structures::LinkedList list(window, font);
     structures::Tree tree(window, font);
+
+    enum ActiveStructure {
+        ARRAY,
+        LIST,
+        TREE
+    } active_structure = ARRAY;
+
+    
+    // delete this and references
+    bool temp = true;
 
     while (window.isOpen()) {
         sf::Event event;
         int mouse_click_x = 0, mouse_click_y = 0;
         char key_pressed = '\0';
         while (window.pollEvent(event)) {
-            
             if (event.type == sf::Event::Closed) {
                 window.close();
             } else if (event.type == sf::Event::TextEntered) {
@@ -48,18 +57,30 @@ int main() {
             // Triggering test events
 
             if (event.type == sf::Event::KeyReleased) {
-                if (event.key.code == sf::Keyboard::T) {
-                    // array.sort(SortType::MERGE);
-                    // list.deleteNode(1);
-                    // list.insertAfter(7, 2);
+                if (event.key.code == sf::Keyboard::D) {
+                    if (active_structure == LIST) {
+                        if (temp) {
+                            list.insertAfter(7, 2);
+                            temp = not temp;
+                        } else{
+                            list.deleteNode(2);
+                        }
+                    } else if (active_structure == ARRAY) {
+                        array.sort(structures::Array::SortType::MERGE);
+                    }
                 }
-                if (event.key.code == sf::Keyboard::R) {
-                    // array.randomize();
+                if (event.key.code == sf::Keyboard::A) {
+                    active_structure = ARRAY;
+                }
+                if (event.key.code == sf::Keyboard::L) {
+                    active_structure = LIST;
+                }
+                if (event.key.code == sf::Keyboard::T) {
+                    active_structure = TREE;
                 }
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {
-
                 sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
                 sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
                 if (event.mouseButton.button == sf::Mouse::Left) {
@@ -67,7 +88,7 @@ int main() {
                     lpanel.handleClick(worldPos.x, worldPos.y);
                     mouse_click_x = worldPos.x;
                     mouse_click_y = worldPos.y;
-                }else{
+                } else {
                     // Using negative to show right click. Surely nothing can go wrong.
                     mouse_click_x = -worldPos.x;
                     mouse_click_y = -worldPos.y;
@@ -75,9 +96,21 @@ int main() {
             }
         }
         window.clear();
-        // array.update(mouse_click_x, mouse_click_y, key_pressed);
-        // list.update(mouse_click_x, mouse_click_y, key_pressed);
-        tree.update(mouse_click_x, mouse_click_y, key_pressed);
+
+        switch (active_structure) {
+        case ARRAY:
+            array.update(mouse_click_x, mouse_click_y, key_pressed);
+            break;
+        case LIST:
+            list.update(mouse_click_x, mouse_click_y, key_pressed);
+            break;
+        case TREE:
+            tree.update(mouse_click_x, mouse_click_y, key_pressed);
+            break;
+        default:
+            std::cout << "Error: Invalid Structure\n";
+            return 0;
+        }
         lpanel.update(window);
         window.display();
     }

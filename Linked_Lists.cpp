@@ -45,10 +45,13 @@ void structures::LinkedList::removeNode(int idx = -1) {
 }
 
 void structures::LinkedList::handleClick(float mouseX, float mouseY) {
+    if(mouseX <= 0 and mouseY <= 0){ // return if no click or right click
+        return;
+    }
     for (int i = 0; i < list.size(); i++) {
         Node &node = list[i];
         if (node.ptr_dot.getGlobalBounds().contains(mouseX, mouseY)) {
-            addNode(0, i + 1);
+            addNode(rand()%100, i + 1);
             return;
         }
         if (node.self_dot.getGlobalBounds().contains(mouseX, mouseY)) {
@@ -352,7 +355,9 @@ void structures::LinkedList::deleteNode(int index) {
     void (LinkedList::*func)(int, bool) = &LinkedList::deleteNode;
     std::thread(func, this, index, true).detach();
 }
-void structures::LinkedList::update() {
+void structures::LinkedList::update(float mouseX, float mouseY, char key) {
+    handleClick(mouseX, mouseY);
+    handleKeypress(key);
     if (change_made) {
         float x_pos = window_size.x;                       // get the window width
         x_pos -= node_size.width * list.size();            // subtract the size of all the node blocks (value+ptr box)

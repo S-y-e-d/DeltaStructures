@@ -21,13 +21,6 @@ namespace structures {
             int value;
         };
 
-        enum SortType {
-            NONE,
-            BUBBLE,
-            INSERTION,
-            SELECTION,
-            MERGE
-        };
         std::vector<Block> array;
         sf::RenderWindow &window;
         sf::Font &font;
@@ -55,15 +48,22 @@ namespace structures {
         void mergeSort();
         void makeGradient();
 
+        void handleClick(float mouseX, float mouseY);
+        void handleKeypress(char key);
     public:
+        enum SortType {
+            NONE,
+            BUBBLE,
+            INSERTION,
+            SELECTION,
+            MERGE
+        };
         Array(sf::RenderWindow &window, sf::Font &font);
         void addBlock(int value);
         void removeBlock();
-        void update();
+        void update(float mouseX, float mouseY, char key);
         void randomize();
         void setBlockSize(int size);
-        void handleClick(float mouseX, float mouseY);
-        void handleKeypress(char key);
 
         void sort(SortType type);
         void insertAt(int val, int index);
@@ -105,13 +105,13 @@ namespace structures {
         void insert(int value, int after, bool thread);
         void deleteNode(int index, bool thread);
 
+        void handleClick(float mouseX, float mouseY);
+        void handleKeypress(char key);
     public:
         LinkedList(sf::RenderWindow &, sf::Font &);
         void addNode(int value, int idx);
         void removeNode(int idx);  // default - 1
-        void handleClick(float mouseX, float mouseY);
-        void handleKeypress(char key);
-        void update();
+        void update(float mouseX, float mouseY, char key);
 
         void insertAfter(int value, int after);
         void deleteNode(int index);

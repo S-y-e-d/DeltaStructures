@@ -50,6 +50,9 @@ void structures::Array::setBlockSize(int size) {
 }
 
 void structures::Array::handleClick(float mouseX, float mouseY) {
+    if (mouseX <= 0 and mouseY <= 0) {  // return if right click or no click
+        return;
+    }
     for (auto &block : array) {
         // if mouse is clicked inside array block
         if (block.shape.getGlobalBounds().contains(mouseX, mouseY)) {
@@ -74,7 +77,7 @@ void structures::Array::handleClick(float mouseX, float mouseY) {
     }
     // detect click on adding and removing blocks
     if (block_add.getGlobalBounds().contains(mouseX, mouseY)) {
-        addBlock(0);
+        addBlock(rand()%100);
         change_made = true;
     } else if (block_remove.getGlobalBounds().contains(mouseX, mouseY)) {
         removeBlock();
@@ -130,27 +133,29 @@ void structures::Array::randomize() {
 }
 
 void structures::Array::handleKeypress(char key) {
+    if (value_edit_index == -1) {
+        return;
+    }
     // If editing the value of a block
-    if (value_edit_index != -1) {
-        Block &block = array[value_edit_index];
-        // If pressed a number
-        if (isdigit(key)) {
-            if (block.num_text.getCharacterSize() <= 18) {
-                return;
-            }
-            if (block.num_text.getString() == "0") {
-                block.num_text.setString("");
-            }
-            setValue(block, stoi(std::string(block.num_text.getString() + key)));
-        } else if (key == '\b') {
-            std::string str = block.num_text.getString();
-            if (str.size() > 1) {
-                str.pop_back();
-            } else {
-                str = "0";
-            }
-            setValue(block, stoi(str));
+
+    Block &block = array[value_edit_index];
+    // If pressed a number
+    if (isdigit(key)) {
+        if (block.num_text.getCharacterSize() <= 18) {
+            return;
         }
+        if (block.num_text.getString() == "0") {
+            block.num_text.setString("");
+        }
+        setValue(block, stoi(std::string(block.num_text.getString() + key)));
+    } else if (key == '\b') {
+        std::string str = block.num_text.getString();
+        if (str.size() > 1) {
+            str.pop_back();
+        } else {
+            str = "0";
+        }
+        setValue(block, stoi(str));
     }
 }
 
@@ -419,6 +424,7 @@ void structures::Array::mergeSort() {
             if (it == states.size() - 1) {
                 for (auto i : states[it]) {
                     moveBlock(i, sf::Vector2f(start_x, start_y));
+                    start_x += block_size;
                 }
                 continue;
             }
@@ -522,7 +528,9 @@ void structures::Array::makeGradient() {
     }
 }
 
-void structures::Array::update() {
+void structures::Array::update(float mouseX, float mouseY, char key) {
+    handleClick(mouseX, mouseY);
+    handleKeypress(key);
     if (change_made) {
         // Reset positions of everything by recalculating the middle of the page.
         int x = (window_size.x - block_size * array.size()) / 2;
@@ -552,7 +560,6 @@ void structures::Array::update() {
     }
     // Draw temporary blocks that were used to animate.
     for (auto &temp : temp_drawables) {
-        std::visit([&](auto &&obj) { window.draw(obj); },
-                   temp);
+        std::visit([&](auto &&obj) { window.draw(obj); }, temp);
     }
 }

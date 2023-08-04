@@ -264,11 +264,11 @@ void structures::Tree::update(int mouseX, int mouseY, char key) {
 
                 tree[current]->l_box.setPosition(
                     start_x + j * node_size.ptr_width,
-                    start_y + i * node_size.ptr_width + node_size.value_height - 1);
+                    start_y + i * node_size.ptr_width + node_size.value_height - 2);
 
                 tree[current]->r_box.setPosition(
                     start_x + j * node_size.ptr_width + node_size.ptr_width - 1,
-                    start_y + i * node_size.ptr_width + node_size.value_height - 1);
+                    start_y + i * node_size.ptr_width + node_size.value_height - 2);
 
                 tree[current]->l_dot.setPosition(
                     start_x + j * node_size.ptr_width,
