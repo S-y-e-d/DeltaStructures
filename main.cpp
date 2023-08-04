@@ -1,4 +1,5 @@
 #include "Panels.hpp"
+#include "Interface.hpp"
 #include "Structures.hpp"
 
 // refactor panels to use threads and use move instead of set positions.
@@ -33,9 +34,17 @@ int main() {
     enum ActiveStructure {
         ARRAY,
         LIST,
-        TREE
-    } active_structure = ARRAY;
+        TREE,
+        NONE
+    } active_structure = NONE;
 
+    ui::Button button(window, font);
+    button.getRect().setSize(sf::Vector2f(100, 50));
+    button.getRect().setOutlineThickness(-2);
+    button.getRect().setOutlineColor(sf::Color::White);
+    button.getRect().setFillColor(sf::Color::Transparent);
+    button.setPosition(500, 500);
+    button.setText("Click", 18, sf::Color::White);
     
     // delete this and references
     bool temp = true;
@@ -108,10 +117,18 @@ int main() {
             tree.update(mouse_click_x, mouse_click_y, key_pressed);
             break;
         default:
-            std::cout << "Error: Invalid Structure\n";
-            return 0;
+            break;
         }
         lpanel.update(window);
+
+        if(button.mouseOver()){
+            button.getRect().setOutlineThickness(2);
+        }
+        if(button.mouseOut()){
+            button.getRect().setOutlineThickness(-2);
+        }
+        button.update(mouse_click_x, mouse_click_y, key_pressed);
+        
         window.display();
     }
 
