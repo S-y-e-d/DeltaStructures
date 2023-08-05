@@ -39,13 +39,22 @@ int main() {
     } active_structure = NONE;
 
     ui::Button button(window, font);
-    button.getRect().setSize(sf::Vector2f(100, 50));
-    button.getRect().setOutlineThickness(-2);
-    button.getRect().setOutlineColor(sf::Color::White);
-    button.getRect().setFillColor(sf::Color::Transparent);
+    button.setSize(100, 50);
+    button.setOutlineThickness(-2);
+    button.setOutlineColor(sf::Color::White);
+    button.setFillColor(sf::Color::Transparent);
     button.setPosition(500, 500);
     button.setText("Click", 18, sf::Color::White);
     
+    ui::Input inp(window, font);
+    inp.setSize(500, 50);
+    inp.setOutlineThickness(-1);
+    inp.setOutlineColor(sf::Color::White);
+    inp.setFillColor(sf::Color(50, 50, 50, 255));
+    inp.setPosition(200, 200);
+    inp.setTextColor(sf::Color::White);
+    inp.setPlaceholder("enter text...", sf::Color(100, 100, 100, 255));
+
     // delete this and references
     bool temp = true;
 
@@ -78,15 +87,16 @@ int main() {
                         array.sort(structures::Array::SortType::MERGE);
                     }
                 }
-                if (event.key.code == sf::Keyboard::A) {
-                    active_structure = ARRAY;
-                }
-                if (event.key.code == sf::Keyboard::L) {
-                    active_structure = LIST;
-                }
-                if (event.key.code == sf::Keyboard::T) {
-                    active_structure = TREE;
-                }
+
+                // if (event.key.code == sf::Keyboard::A) {
+                //     active_structure = ARRAY;
+                // }
+                // if (event.key.code == sf::Keyboard::L) {
+                //     active_structure = LIST;
+                // }
+                // if (event.key.code == sf::Keyboard::T) {
+                //     active_structure = TREE;
+                // }
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {
@@ -122,13 +132,17 @@ int main() {
         lpanel.update(window);
 
         if(button.mouseOver()){
-            button.getRect().setOutlineThickness(2);
+            button.setOutlineThickness(2);
         }
         if(button.mouseOut()){
-            button.getRect().setOutlineThickness(-2);
+            button.setOutlineThickness(-2);
+        }
+        if(button.clicked()){
+            // std::cout << "Clicked\n";
+            std::cout << inp.getString() << std::endl;
         }
         button.update(mouse_click_x, mouse_click_y, key_pressed);
-        
+        inp.update(mouse_click_x, mouse_click_y, key_pressed);
         window.display();
     }
 
