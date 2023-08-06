@@ -23,6 +23,7 @@ namespace ui {
         Button(sf::RenderWindow &window, sf::Font &font);
 
         void setPosition(int x, int y);
+        void move(int x, int y);
         void setText(std::string txt, int font_size, sf::Color text_color = sf::Color::Black);
 
         bool mouseOver();  // return true if the mouse has been brought over, not when it's already been over.
@@ -62,6 +63,7 @@ namespace ui {
         Input(sf::RenderWindow &window, sf::Font &font);
         
         void setPosition(int x, int y);
+        void move(int x, int y);
         void setSize(int width, int height);
         void setOutlineThickness(int thickness);
         void setOutlineColor(sf::Color color);
@@ -79,9 +81,31 @@ namespace ui {
         sf::RenderWindow &window;
         sf::Font &font;
 
+        std::map<std::string, Button*> buttons;         // Had to use pointers because SFML does not allow assignment of RenderWindow
+        std::map<std::string, Input*> inputs;
+        std::map<std::string, sf::Text*> labels;
+
     public:
         Container(sf::RenderWindow &window, sf::Font &font);
+        ~Container();
+        enum ComponentType{
+            BUTTON,
+            INPUT,
+            LABEL
+        } type;
         
+        void addComponent(ComponentType type, std::string id, int xr, int yr, int width = 0, int height = 0);
+        Button& getButtonById(std::string id);
+        Input& getInputById(std::string id);
+        sf::Text& getLabelById(std::string id);
+
+        void setSize(int width, int height);
+        void setPosition(int x, int y);
+        void setFillColor(sf::Color color);
+        void setOutlineThickness(int thickness);
+        void setOutlineColor(sf::Color color);
+
+        void update(float mouseX, float mouseY, char key);
     };
 };
 

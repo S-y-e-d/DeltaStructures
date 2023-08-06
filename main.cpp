@@ -139,6 +139,7 @@ int main() {
         }
         if(button.clicked()){
             // std::cout << "Clicked\n";
+            button.setOutlineThickness(-2);
             std::cout << inp.getString() << std::endl;
         }
         button.update(mouse_click_x, mouse_click_y, key_pressed);
