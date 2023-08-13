@@ -13,8 +13,7 @@
 namespace ui {
     using namespace std::chrono_literals;
 
-    class Button {
-        sf::RectangleShape rect;
+    class Button : public sf::RectangleShape {
         sf::Text text;
         sf::RenderWindow &window;
         sf::Font &font;
@@ -25,33 +24,9 @@ namespace ui {
         Button(sf::RenderWindow &window, sf::Font &font);
 
         void setPosition(int x, int y);
-        void move(int x, int y);
+        void move(float x, float y);
         void setText(std::string txt, int font_size, sf::Color text_color = sf::Color::Black);
-
-        bool mouseOver();  // return true if the mouse has been brought over, not when it's already been over.
-        bool mouseOut();
-        bool clicked();
-        void setOutlineThickness(int thickness);
-        void setSize(int width, int height);
-        void setOutlineColor(sf::Color color);
-        void setFillColor(sf::Color color);
-
-        void update(float mouseX, float mouseY, char key);
-    };
-
-
-    class Button2Test : sf::RectangleShape {
-        sf::Text text;
-        sf::RenderWindow &window;
-        sf::Font &font;
-        bool pressed = false;
-        bool mouse_over = false;
-
-    public:
-        Button2Test(sf::RenderWindow &window, sf::Font &font);
-
-        void move(int x, int y);
-        void setText(std::string txt, int font_size, sf::Color text_color = sf::Color::Black);
+        void onHover(int change);
 
         bool mouseOver();  // return true if the mouse has been brought over, not when it's already been over.
         bool mouseOut();
@@ -60,8 +35,7 @@ namespace ui {
         void update(float mouseX, float mouseY, char key);
     };
 
-    class Input{
-        sf::RectangleShape rect;
+    class Input : public sf::RectangleShape{
         sf::Text text;
         std::string text_string;
         sf::RenderWindow &window;
@@ -88,10 +62,8 @@ namespace ui {
         void setPosition(int x, int y);
         void move(int x, int y);
         void setSize(int width, int height);
-        void setOutlineThickness(int thickness);
-        void setOutlineColor(sf::Color color);
-        void setFillColor(sf::Color color);
         void setTextColor(sf::Color color);
+        void setFillColor(sf::Color color);
         void setPlaceholder(std::string text, sf::Color color);
 
         std::string getString();
@@ -99,8 +71,7 @@ namespace ui {
         void update(float mouseX, float mouseY, char key);
     };
 
-    class Container {
-        sf::RectangleShape rect;
+    class Container : public sf::RectangleShape {
         sf::RenderWindow &window;
         sf::Font &font;
 
@@ -122,20 +93,16 @@ namespace ui {
         Container(sf::RenderWindow &window, sf::Font &font);
         ~Container();
         
-        void addComponent(ComponentType type, std::string id, int xr, int yr, int width = 0, int height = 0);
+        void addComponent(ComponentType type, std::string id, int xr = 0, int yr = 0, int width = 0, int height = 0);
         Button& getButtonById(std::string id);
         Input& getInputById(std::string id);
         sf::Text& getLabelById(std::string id);
-        sf::Vector2f getPosition();
-        sf::Vector2f getSize();
-        int getState();
 
-        void setSize(int width, int height);
-        void setPosition(int x, int y);
-        void setFillColor(sf::Color color);
-        void setOutlineThickness(int thickness);
-        void setOutlineColor(sf::Color color);
+        int getState();
         void setState(int st);
+
+        void setPosition(int x, int y);
+        void setLabel(std::string id, std::string str, float left, float right, float top, float bottom);
 
         void move(float x, float y, float speed, bool thread);
         void move(float x, float y, float speed = 0);
