@@ -7,6 +7,8 @@
 #include <thread>
 #include <variant>
 #include <vector>
+#include <codecvt>
+#include <locale>
 
 namespace ui {
     using namespace std::chrono_literals;
@@ -33,6 +35,27 @@ namespace ui {
         void setSize(int width, int height);
         void setOutlineColor(sf::Color color);
         void setFillColor(sf::Color color);
+
+        void update(float mouseX, float mouseY, char key);
+    };
+
+
+    class Button2Test : sf::RectangleShape {
+        sf::Text text;
+        sf::RenderWindow &window;
+        sf::Font &font;
+        bool pressed = false;
+        bool mouse_over = false;
+
+    public:
+        Button2Test(sf::RenderWindow &window, sf::Font &font);
+
+        void move(int x, int y);
+        void setText(std::string txt, int font_size, sf::Color text_color = sf::Color::Black);
+
+        bool mouseOver();  // return true if the mouse has been brought over, not when it's already been over.
+        bool mouseOut();
+        bool clicked();
 
         void update(float mouseX, float mouseY, char key);
     };
@@ -85,25 +108,37 @@ namespace ui {
         std::map<std::string, Input*> inputs;
         std::map<std::string, sf::Text*> labels;
 
+        bool moving = false;
+        int state = 0;      // have this to store information for the main function to use.
+
     public:
-        Container(sf::RenderWindow &window, sf::Font &font);
-        ~Container();
         enum ComponentType{
             BUTTON,
             INPUT,
             LABEL
         } type;
+
+        
+        Container(sf::RenderWindow &window, sf::Font &font);
+        ~Container();
         
         void addComponent(ComponentType type, std::string id, int xr, int yr, int width = 0, int height = 0);
         Button& getButtonById(std::string id);
         Input& getInputById(std::string id);
         sf::Text& getLabelById(std::string id);
+        sf::Vector2f getPosition();
+        sf::Vector2f getSize();
+        int getState();
 
         void setSize(int width, int height);
         void setPosition(int x, int y);
         void setFillColor(sf::Color color);
         void setOutlineThickness(int thickness);
         void setOutlineColor(sf::Color color);
+        void setState(int st);
+
+        void move(float x, float y, float speed, bool thread);
+        void move(float x, float y, float speed = 0);
 
         void update(float mouseX, float mouseY, char key);
     };

@@ -7,6 +7,7 @@ ui::Button::Button(sf::RenderWindow& window, sf::Font& font) : window(window), f
 }
 
 void ui::Button::setPosition(int x, int y) {
+    
     text.move(sf::Vector2f(x, y) - rect.getPosition());
     rect.setPosition(x, y);
 }
@@ -36,7 +37,12 @@ bool ui::Button::clicked() {
 }
 
 void ui::Button::setText(std::string txt, int font_size, sf::Color text_color) {
-    text.setString(txt);
+    
+    // convert the string to wstring in order to use non ascii characters.
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
+    std::wstring wtxt = converter.from_bytes(txt);
+    
+    text.setString(wtxt);
     text.setCharacterSize(font_size);
     text.setFillColor(text_color);
     int x_pos = rect.getPosition().x + (rect.getGlobalBounds().width - text.getGlobalBounds().width) / 2;
@@ -96,7 +102,7 @@ void ui::Input::setPosition(int x, int y) {
     text.setPosition(x + padding, y_pos);
     text.setString("");
 }
-void ui::Input::move(int x, int y){
+void ui::Input::move(int x, int y) {
     rect.move(x, y);
     text.move(x, y);
     i_cursor.move(x, y);
@@ -238,12 +244,17 @@ ui::Input& ui::Container::getInputById(std::string id) {
 sf::Text& ui::Container::getLabelById(std::string id) {
     return *labels[id];
 }
-
+sf::Vector2f ui::Container::getPosition() {
+    return rect.getPosition();
+}
+sf::Vector2f ui::Container::getSize() {
+    return rect.getSize();
+}
 void ui::Container::setSize(int width, int height) {
     rect.setSize(sf::Vector2f(width, height));
 }
 void ui::Container::setPosition(int x, int y) {
-    int xr = x - rect.getPosition().x;              // xr and yr are the relative displacement (destination - start)
+    int xr = x - rect.getPosition().x;  // xr and yr are the relative displacement (destination - start)
     int yr = y - rect.getPosition().y;
     rect.setPosition(x, y);
     for (auto& [id, button] : buttons) {
@@ -256,17 +267,66 @@ void ui::Container::setPosition(int x, int y) {
         label->move(xr, yr);
     }
 }
-void ui::Container::setFillColor(sf::Color color){
+
+void ui::Container::move(float x, float y, float speed, bool thread) {
+    moving = true;
+    sf::Vector2f velocity = {x / 100 * speed, y / 100 * speed};
+    for (int i = 0; i < 100 / speed; i++) {
+        rect.move(velocity.x, velocity.y);
+        for (auto& [id, button] : buttons) {
+            button->move(velocity.x, velocity.y);
+        }
+        for (auto& [id, input] : inputs) {
+            input->move(velocity.x, velocity.y);
+        }
+        for (auto& [id, label] : labels) {
+            label->move(velocity.x, velocity.y);
+        }
+        std::this_thread::sleep_for(10ms);
+    }
+    moving = false;
+}
+
+void ui::Container::move(float x, float y, float speed) {  // default speed 0 = instant
+    if (speed > 0) {
+        if (moving) {
+            return;
+        }
+        void (ui::Container::*func)(float, float, float, bool) = &ui::Container::move;
+        std::thread(func, this, x, y, speed, true).detach();
+        return;
+    }
+    rect.move(x, y);
+    for (auto& [id, button] : buttons) {
+        button->move(x, y);
+    }
+    for (auto& [id, input] : inputs) {
+        input->move(x, y);
+    }
+    for (auto& [id, label] : labels) {
+        label->move(x, y);
+    }
+}
+void ui::Container::setFillColor(sf::Color color) {
     rect.setFillColor(color);
 }
-void ui::Container::setOutlineColor(sf::Color color){
+void ui::Container::setOutlineColor(sf::Color color) {
     rect.setOutlineColor(color);
 }
-void ui::Container::setOutlineThickness(int thickness){
+void ui::Container::setOutlineThickness(int thickness) {
     rect.setOutlineThickness(thickness);
+}
+void ui::Container::setState(int st) {
+    if (not moving) {
+        state = st;
+    }
+}
+int ui::Container::getState() {
+    return state;
 }
 
 void ui::Container::update(float mouseX, float mouseY, char key) {
+    window.draw(rect);
     for (auto& [id, button] : buttons) {
         button->update(mouseX, mouseY, key);
     }

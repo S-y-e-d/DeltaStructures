@@ -15,18 +15,12 @@ int main() {
     window.setFramerateLimit(60);
 
     sf::Font font;
-    if (!font.loadFromFile("./assets/DejaVuSansMono.ttf")) {
+    if (!font.loadFromFile("./assets/ARIAL.TTF")) {
         std::cout << "Error: Couldn't load font\n";
         return 0;
     }
 
-    sf::Vector2f leftPanelPos(-130, 0);
-    Panel lpanel(sf::Vector2f(150, window_size.y), sf::Vector2f(-130, 0));
-    lpanel.getPanel().setFillColor(sf::Color::White);
-    lpanel.setStates(sf::Vector2f(-130, 0), sf::Vector2f(0, 0));
-
-    lpanel.addComponent(10, 3, sf::Color::Black, State{sf::Vector2f(137, window_size.y / 2 - 5), 90}, State{sf::Vector2f(137, window_size.y / 2 - 5), 270});
-
+    
     structures::Array array(window, font);
     structures::LinkedList list(window, font);
     structures::Tree tree(window, font);
@@ -38,25 +32,33 @@ int main() {
         NONE
     } active_structure = NONE;
 
-    ui::Button button(window, font);
-    button.setSize(100, 50);
-    button.setOutlineThickness(-2);
-    button.setOutlineColor(sf::Color::White);
-    button.setFillColor(sf::Color::Transparent);
-    button.setPosition(500, 500);
-    button.setText("Click", 18, sf::Color::White);
+    ui::Container lpanel(window, font);
+    lpanel.setSize(window_size.x/4, window_size.y);
+    lpanel.setFillColor(sf::Color(10, 10, 10, 255));
+    lpanel.setOutlineColor(sf::Color::White);
+    lpanel.setOutlineThickness(-2);
+    lpanel.setPosition(-window_size.x/4 + 70, 0);       // panel peaking to show button (50) + 10 padding each side
     
-    ui::Input inp(window, font);
-    inp.setSize(500, 50);
-    inp.setOutlineThickness(-1);
-    inp.setOutlineColor(sf::Color::White);
-    inp.setFillColor(sf::Color(50, 50, 50, 255));
-    inp.setPosition(200, 200);
-    inp.setTextColor(sf::Color::White);
-    inp.setPlaceholder("enter text...", sf::Color(100, 100, 100, 255));
+    lpanel.addComponent(ui::Container::ComponentType::BUTTON, "btn1", window_size.x/4 - 60, 10, 50, 50);
+    lpanel.getButtonById("btn1").setOutlineThickness(-2);
+    lpanel.getButtonById("btn1").setOutlineColor(sf::Color::White);
+    lpanel.getButtonById("btn1").setFillColor(sf::Color::Transparent);
+    lpanel.getButtonById("btn1").setText("≡", 18, sf::Color::White);
+    lpanel.setState(0);
+    
+
+
+    // ui::Input inp(window, font);
+    // inp.setSize(500, 50);
+    // inp.setOutlineThickness(-1);
+    // inp.setOutlineColor(sf::Color::White);
+    // inp.setFillColor(sf::Color(50, 50, 50, 255));
+    // inp.setPosition(200, 200);
+    // inp.setTextColor(sf::Color::White);
+    // inp.setPlaceholder("enter text...", sf::Color(100, 100, 100, 255));
 
     // delete this and references
-    bool temp = true;
+    
 
     while (window.isOpen()) {
         sf::Event event;
@@ -75,19 +77,6 @@ int main() {
             // Triggering test events
 
             if (event.type == sf::Event::KeyReleased) {
-                if (event.key.code == sf::Keyboard::D) {
-                    if (active_structure == LIST) {
-                        if (temp) {
-                            list.insertAfter(7, 2);
-                            temp = not temp;
-                        } else{
-                            list.deleteNode(2);
-                        }
-                    } else if (active_structure == ARRAY) {
-                        array.sort(structures::Array::SortType::MERGE);
-                    }
-                }
-
                 // if (event.key.code == sf::Keyboard::A) {
                 //     active_structure = ARRAY;
                 // }
@@ -104,7 +93,6 @@ int main() {
                 sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     // Convert the position of the pixel to the relative coordinate of the original window
-                    lpanel.handleClick(worldPos.x, worldPos.y);
                     mouse_click_x = worldPos.x;
                     mouse_click_y = worldPos.y;
                 } else {
@@ -129,21 +117,28 @@ int main() {
         default:
             break;
         }
-        lpanel.update(window);
 
-        if(button.mouseOver()){
-            button.setOutlineThickness(2);
+        if(lpanel.getButtonById("btn1").mouseOver()){
+            lpanel.getButtonById("btn1").setOutlineThickness(2);
         }
-        if(button.mouseOut()){
-            button.setOutlineThickness(-2);
+        if(lpanel.getButtonById("btn1").mouseOut()){
+            lpanel.getButtonById("btn1").setOutlineThickness(-2);
         }
-        if(button.clicked()){
-            // std::cout << "Clicked\n";
-            button.setOutlineThickness(-2);
-            std::cout << inp.getString() << std::endl;
+        
+        if(lpanel.getButtonById("btn1").clicked()){
+            lpanel.getButtonById("btn1").setOutlineThickness(-2);
+            
+            if(lpanel.getState()== 0){
+                lpanel.setState(1);
+                lpanel.move(lpanel.getSize().x - 70, 0, 2);     // 70 being the button size
+            }else if(lpanel.getState() == 1){
+                lpanel.setState(0);
+                lpanel.move(-lpanel.getSize().x + 70, 0, 2);
+            }
+            
         }
-        button.update(mouse_click_x, mouse_click_y, key_pressed);
-        inp.update(mouse_click_x, mouse_click_y, key_pressed);
+        lpanel.update(mouse_click_x, mouse_click_y, key_pressed);
+        // inp.update(mouse_click_x, mouse_click_y, key_pressed);
         window.display();
     }
 
