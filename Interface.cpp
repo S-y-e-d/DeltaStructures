@@ -67,15 +67,23 @@ bool ui::Button::mouseOut() {
 }
 
 void ui::Button::onHover(int change) {
+    static int ch = 0;
+    if(change != 0){
+        ch = change;
+    }
     if (mouseOver()) {
-        setOutlineThickness(change);
+        setOutlineThickness(ch);
     }
     if (mouseOut()) {
-        setOutlineThickness(-change);
+        setOutlineThickness(-ch);
     }
 }
 
 void ui::Button::update(float mouseX, float mouseY, char key) {
+    if(hidden){
+        return;
+    }
+    onHover();
     if (getGlobalBounds().contains(mouseX, mouseY)) {
         pressed = true;
     }

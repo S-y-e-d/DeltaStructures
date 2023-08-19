@@ -21,12 +21,13 @@ namespace ui {
         bool mouse_over = false;
 
     public:
+        bool hidden = false;
         Button(sf::RenderWindow &window, sf::Font &font);
 
         void setPosition(int x, int y);
         void move(float x, float y);
         void setText(std::string txt, int font_size, sf::Color text_color = sf::Color::Black);
-        void onHover(int change);
+        void onHover(int change = 0);
 
         bool mouseOver();  // return true if the mouse has been brought over, not when it's already been over.
         bool mouseOut();

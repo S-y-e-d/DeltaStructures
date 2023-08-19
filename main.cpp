@@ -1,6 +1,6 @@
-#include "Panels.hpp"
 #include "Interface.hpp"
 #include "Structures.hpp"
+#include "design.hpp"
 
 // refactor panels to use threads and use move instead of set positions.
 
@@ -20,57 +20,35 @@ int main() {
         return 0;
     }
 
-    
     structures::Array array(window, font);
-    array.addBlock(1); array.addBlock(2); array.addBlock(3);
+    array.addBlock(1);
+    array.addBlock(2);
+    array.addBlock(3);
     structures::LinkedList list(window, font);
     structures::Tree tree(window, font);
-
-    enum ActiveStructure {
-        ARRAY,
-        LIST,
-        TREE,
-        NONE
-    } active_structure = NONE;
+    active_structure = NONE;
 
     ui::Container lpanel(window, font);
-    lpanel.setSize(sf::Vector2f(450, window_size.y));
-    lpanel.setFillColor(sf::Color(10, 10, 10, 255));
-    lpanel.setOutlineColor(sf::Color::White);
-    lpanel.setOutlineThickness(-2);
-    lpanel.setPosition(-450 + 70, 0);       // panel peaking to show button (50) + 10 padding each side
-    lpanel.setState(0);
-    
-    lpanel.addComponent(ui::Container::ComponentType::BUTTON, "open", 450 - 60, 10, 50, 50);
-
-    lpanel.getButtonById("open").setOutlineThickness(-2);
-    lpanel.getButtonById("open").setOutlineColor(sf::Color::White);
-    lpanel.getButtonById("open").setFillColor(sf::Color::Transparent);
-    lpanel.getButtonById("open").setText("≡", 18, sf::Color::White);
-
-    lpanel.addComponent(ui::Container::ComponentType::LABEL, "lpanel");
-    lpanel.setLabel("lpanel", "Structures", 50, 400, 100, 150);
-
-    lpanel.addComponent(ui::Container::ComponentType::BUTTON, "array", 50, 200, lpanel.getSize().x - 100, 50);
-    lpanel.getButtonById("array").setOutlineThickness(-2);
-    lpanel.getButtonById("array").setOutlineColor(sf::Color::White);
-    lpanel.getButtonById("array").setFillColor(sf::Color::Transparent);
-    lpanel.getButtonById("array").setText("Array", 18, sf::Color::White);
-
-    lpanel.addComponent(ui::Container::ComponentType::BUTTON, "list", 50, 300, lpanel.getSize().x - 100, 50);
-    lpanel.getButtonById("list").setOutlineThickness(-2);
-    lpanel.getButtonById("list").setOutlineColor(sf::Color::White);
-    lpanel.getButtonById("list").setFillColor(sf::Color::Transparent);
-    lpanel.getButtonById("list").setText("Linked List", 18, sf::Color::White);
-
-    lpanel.addComponent(ui::Container::ComponentType::BUTTON, "tree", 50, 400, lpanel.getSize().x - 100, 50);
-    lpanel.getButtonById("tree").setOutlineThickness(-2);
-    lpanel.getButtonById("tree").setOutlineColor(sf::Color::White);
-    lpanel.getButtonById("tree").setFillColor(sf::Color::Transparent);
-    lpanel.getButtonById("tree").setText("Tree", 18, sf::Color::White);
-
+    /*
+        Buttons:
+            open, array, list, tree
+        Labels:
+            lpanel
+    */
+   ui::Container rpanel(window, font);
+    design(window_size, lpanel, rpanel);
+  
     // delete this and references
-    // bool temp;    
+    // bool temp;
+    // ui::Button temp(window, font);
+    // temp.setSize(sf::Vector2f(100, 100));
+    // temp.setPosition(70, 70);
+    // temp.setOutlineColor(sf::Color::White);
+    // temp.setOutlineThickness(-2);
+    // temp.onHover(2);
+    // temp.setText("Test", 32, sf::Color::White);
+    // temp.setFillColor(sf::Color::Transparent);
+    // temp.hidden = true;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -121,39 +99,51 @@ int main() {
             break;
         }
 
-        lpanel.getButtonById("open").onHover(2);
-        lpanel.getButtonById("array").onHover(2);
-        lpanel.getButtonById("list").onHover(2);
-        lpanel.getButtonById("tree").onHover(2);
-        
-        
-        if(lpanel.getButtonById("open").clicked()){
+
+        // Left panel config
+        if (lpanel.getButtonById("open").clicked()) {
             lpanel.getButtonById("open").setOutlineThickness(-2);
-            
-            if(lpanel.getState()== 0){
+
+            if (lpanel.getState() == 0) {
                 lpanel.setState(1);
-                lpanel.move(lpanel.getSize().x - 70, 0, 5);     // 70 being the button size
-            }else if(lpanel.getState() == 1){
+                lpanel.move(lpanel.getSize().x - 70, 0, 5);  // 70 being the button size
+            } else if (lpanel.getState() == 1) {
                 lpanel.setState(0);
                 lpanel.move(-lpanel.getSize().x + 70, 0, 5);
             }
         }
-
-        if(lpanel.getButtonById("array").clicked()){
+        if (lpanel.getButtonById("array").clicked()) {
             lpanel.getButtonById("array").setOutlineThickness(-2);
             active_structure = ARRAY;
+            toggleButtons(rpanel);
         }
-        if(lpanel.getButtonById("list").clicked()){
+        if (lpanel.getButtonById("list").clicked()) {
             lpanel.getButtonById("list").setOutlineThickness(-2);
             active_structure = LIST;
+            toggleButtons(rpanel);
         }
-        if(lpanel.getButtonById("tree").clicked()){
+        if (lpanel.getButtonById("tree").clicked()) {
             lpanel.getButtonById("tree").setOutlineThickness(-2);
             active_structure = TREE;
+            toggleButtons(rpanel);
+        }
+
+        // Right panel config
+        if (rpanel.getButtonById("open").clicked()) {
+            rpanel.getButtonById("open").setOutlineThickness(-2);
+
+            if (rpanel.getState() == 0) {
+                rpanel.setState(1);
+                rpanel.move(-rpanel.getSize().x + 70, 0, 5);
+            } else if (rpanel.getState() == 1) {
+                rpanel.setState(0);
+                rpanel.move(rpanel.getSize().x - 70, 0, 5);
+            }
         }
 
         lpanel.update(mouse_click_x, mouse_click_y, key_pressed);
-        // inp.update(mouse_click_x, mouse_click_y, key_pressed);
+        rpanel.update(mouse_click_x, mouse_click_y, key_pressed);
+
         window.display();
     }
 
