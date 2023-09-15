@@ -50,7 +50,6 @@ namespace ui {
 
         sf::RectangleShape i_cursor;
 
-        int padding = 10;
         bool in_focus = false;
 
         void handleKeyPress(char key);
@@ -58,6 +57,10 @@ namespace ui {
         void iCursor();
     
     public:
+        bool hidden = false;
+        int max_font_size = 24;
+        int padding = 8;
+        bool numeric = false;
         Input(sf::RenderWindow &window, sf::Font &font);
         
         void setPosition(int x, int y);

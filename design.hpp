@@ -111,6 +111,16 @@ void design(sf::Vector2i window_size, ui::Container &lpanel, ui::Container &rpan
     rpanel.getButtonById("arrInsert").setText("Insert at Index", 18, sf::Color::White);
     rpanel.getButtonById("arrInsert").onHover(2);
     rpanel.getButtonById("arrInsert").hidden = true;
+    // #################
+    auto ins_bt = rpanel.getButtonById("arrInsert").getGlobalBounds();
+    rpanel.addComponent(ui::Container::ComponentType::INPUT, "arrInsertIdx", 50 + ins_bt.width - 50, 600, 50, 50);
+    rpanel.getInputById("arrInsertIdx").setFillColor(sf::Color(20, 20, 20));
+    rpanel.getInputById("arrInsertIdx").setTextColor(sf::Color::White);
+    rpanel.getInputById("arrInsertIdx").setPlaceholder("0", sf::Color(127, 127, 127));
+    rpanel.getInputById("arrInsertIdx").setOutlineThickness(-2);
+    rpanel.getInputById("arrInsertIdx").setOutlineColor(sf::Color::White);
+    rpanel.getInputById("arrInsertIdx").numeric = true;
+    rpanel.getInputById("arrInsertIdx").hidden = true;
 
     rpanel.addComponent(ui::Container::ComponentType::BUTTON, "arrDelete", 50, 700, rpanel.getSize().x - 100, 50);
     rpanel.getButtonById("arrDelete").setOutlineThickness(-2);
@@ -145,6 +155,8 @@ void toggleButtons(ui::Container &rpanel) {
     rpanel.getButtonById("bubSort").hidden = (active_structure != ARRAY);
     rpanel.getButtonById("arrDelete").hidden = (active_structure != ARRAY);
     rpanel.getButtonById("arrInsert").hidden = (active_structure != ARRAY);
+    rpanel.getInputById("arrInsertIdx").hidden = (active_structure != ARRAY);
+
     rpanel.getButtonById("listDelete").hidden = (active_structure != LIST);
     rpanel.getButtonById("listInsert").hidden = (active_structure != LIST);
 }

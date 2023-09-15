@@ -68,7 +68,7 @@ bool ui::Button::mouseOut() {
 
 void ui::Button::onHover(int change) {
     static int ch = 0;
-    if(change != 0){
+    if (change != 0) {
         ch = change;
     }
     if (mouseOver()) {
@@ -80,7 +80,7 @@ void ui::Button::onHover(int change) {
 }
 
 void ui::Button::update(float mouseX, float mouseY, char key) {
-    if(hidden){
+    if (hidden) {
         return;
     }
     onHover();
@@ -100,7 +100,8 @@ ui::Input::Input(sf::RenderWindow& window, sf::Font& font) : window(window), fon
 
 void ui::Input::setPosition(int x, int y) {
     sf::RectangleShape::setPosition(x, y);
-    text.setString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890");  // Centering the text based on all possible inputs
+    // text.setString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890");  // Centering the text based on all possible inputs
+    text.setString("1234567890");  // Centering the text based on only number inputs
     int y_offset = text.getPosition().y - text.getGlobalBounds().top;
     int y_pos = getPosition().y + (getGlobalBounds().height - text.getGlobalBounds().height) / 2 + y_offset;
     text.setPosition(x + padding, y_pos);
@@ -113,8 +114,12 @@ void ui::Input::move(int x, int y) {
 }
 void ui::Input::setSize(int width, int height) {
     sf::RectangleShape::setSize(sf::Vector2f(width, height));
-    text.setString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890");
+    // text.setString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890");
+    text.setString("1234567890");  // Centering the text based on only number inputs
     while (text.getGlobalBounds().height < height - 2 * padding) {
+        if (text.getCharacterSize() >= max_font_size) {
+            break;
+        }
         text.setCharacterSize(text.getCharacterSize() + 1);
     }
     text.setString("");
@@ -160,7 +165,7 @@ void ui::Input::handleClick(float mouseX, float mouseY) {
             return;
         }
         in_focus = true;
-        setFillColor(sf::Color::White);
+        sf::RectangleShape::setFillColor(sf::Color::White);
         text.setFillColor(sf::Color::Black);
         if (text_string.empty()) {
             text.setString("");
@@ -170,7 +175,7 @@ void ui::Input::handleClick(float mouseX, float mouseY) {
     } else {
         in_focus = false;
         i_cursor.setFillColor(sf::Color::Transparent);
-        setFillColor(fill_color);
+        sf::RectangleShape::setFillColor(fill_color);
         text.setFillColor(text_color);
         if (text_string.empty()) {
             text.setString(placeholder_text);
@@ -191,13 +196,23 @@ void ui::Input::handleKeyPress(char key) {
             text_string.pop_back();
         }
     } else {
-        text_string += key;
+        if (numeric == false or isdigit(key) == true) {  // if numeric and not a digit, don't else do
+            text_string += key;
+        }
     }
     text.setString(text_string);
+
+    if (text.getPosition().x + text.getGlobalBounds().width > getPosition().x + getGlobalBounds().width - padding) {
+        text_string.pop_back();
+        text.setString(text_string);
+    }
     i_cursor.setPosition(text.getPosition().x + text.getGlobalBounds().width + 2, getPosition().y + padding / 2);
 }
 
 void ui::Input::update(float mouseX, float mouseY, char key) {
+    if (hidden) {
+        return;
+    }
     handleKeyPress(key);
     handleClick(mouseX, mouseY);
 
@@ -223,8 +238,8 @@ void ui::Container::addComponent(ComponentType type, std::string id, int xr, int
         break;
     case INPUT:
         inputs[id] = new Input(window, font);
-        inputs[id]->setPosition(x, y);
         inputs[id]->setSize(width, height);
+        inputs[id]->setPosition(x, y);
         break;
     case LABEL:
         labels[id] = new sf::Text();
@@ -240,10 +255,10 @@ void ui::Container::setLabel(std::string id, std::string str, float left, float 
     sf::Text& txt = *labels[id];
     txt.setString(str);
     sf::Rect bounds = txt.getGlobalBounds();
-    
+
     float x1 = getPosition().x + left;
     float x2 = getPosition().x + right;
-    
+
     float x_pos = left + (right - left - bounds.width) / 2;
     float y_pos = top + (bottom - top - bounds.height) / 2;
 
